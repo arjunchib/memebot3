@@ -1,0 +1,24 @@
+{
+  "name": "memebot",
+  "module": "src/index.ts",
+  "type": "module",
+  "scripts": {
+    "generate": "drizzle-kit generate:sqlite",
+    "migrate": "bun ./src/migrate.ts",
+    "studio": "drizzle-kit studio",
+    "drop": "drizzle-kit drop",
+    "push": "drizzle-kit push:sqlite"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "better-sqlite3": "^9.4.1",
+    "drizzle-kit": "^0.20.14"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "peach": "link:peach",
+    "drizzle-orm": "^0.29.3"
+  }
+}
