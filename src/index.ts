@@ -11,4 +11,5 @@ await bootstrap({
   syncCommands: {
     guildId: Bun.env.GUILD_ID!,
   },
+  intents: 1 << 7,
 });

@@ -10,8 +10,10 @@ export const commands = createCommands({
     add: slashCommand({
       description: "adds a meme",
       options: {
-        url: string("URL to download", { required: true }),
+        url: string("url to download", { required: true }),
         name: string("name of meme", { required: true }),
+        start: string("start time (from beginning if omitted)"),
+        end: string("end time (to end if omitted)"),
       },
     }),
     play: slashCommand({
