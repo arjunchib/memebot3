@@ -1,30 +1,285 @@
 {
+  "id": "00000000-0000-0000-0000-000000000000",
+  "prevId": "",
   "version": "5",
   "dialect": "sqlite",
-  "id": "ca51971b-3a68-4df5-919f-9c33d684a889",
-  "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
+    "SequelizeMeta": {
+      "name": "SequelizeMeta",
+      "columns": {
+        "name": {
+          "autoincrement": false,
+          "name": "name",
+          "type": "numeric",
+          "primaryKey": true,
+          "notNull": true
+        }
+      },
+      "compositePrimaryKeys": {},
+      "indexes": {},
+      "foreignKeys": {},
+      "uniqueConstraints": {}
+    },
     "memes": {
       "name": "memes",
       "columns": {
         "id": {
+          "autoincrement": false,
           "name": "id",
-          "type": "integer",
+          "type": "numeric",
           "primaryKey": true,
-          "notNull": true,
-          "autoincrement": false
+          "notNull": true
         },
         "name": {
+          "autoincrement": false,
           "name": "name",
-          "type": "text",
+          "type": "numeric",
           "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
+          "notNull": true
+        },
+        "createdAt": {
+          "autoincrement": false,
+          "name": "createdAt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "updatedAt": {
+          "autoincrement": false,
+          "name": "updatedAt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "duration": {
+          "autoincrement": false,
+          "name": "duration",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "size": {
+          "autoincrement": false,
+          "name": "size",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "bit_rate": {
+          "autoincrement": false,
+          "name": "bit_rate",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "loudness_i": {
+          "autoincrement": false,
+          "name": "loudness_i",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "loudness_lra": {
+          "autoincrement": false,
+          "name": "loudness_lra",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "loudness_tp": {
+          "autoincrement": false,
+          "name": "loudness_tp",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "loudness_thresh": {
+          "autoincrement": false,
+          "name": "loudness_thresh",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "author_id": {
+          "autoincrement": false,
+          "name": "author_id",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "playCount": {
+          "default": 0,
+          "autoincrement": false,
+          "name": "playCount",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "randomPlayCount": {
+          "default": 0,
+          "autoincrement": false,
+          "name": "randomPlayCount",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "compositePrimaryKeys": {},
+      "indexes": {},
+      "foreignKeys": {},
+      "uniqueConstraints": {}
+    },
+    "commands": {
+      "name": "commands",
+      "columns": {
+        "name": {
+          "autoincrement": false,
+          "name": "name",
+          "type": "numeric",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "memeId": {
+          "autoincrement": false,
+          "name": "memeId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "createdAt": {
+          "autoincrement": false,
+          "name": "createdAt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "updatedAt": {
+          "autoincrement": false,
+          "name": "updatedAt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "compositePrimaryKeys": {},
+      "indexes": {},
+      "foreignKeys": {
+        "commands_memeId_memes_id_fk": {
+          "name": "commands_memeId_memes_id_fk",
+          "tableFrom": "commands",
+          "tableTo": "memes",
+          "columnsFrom": [
+            "memeId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "uniqueConstraints": {}
+    },
+    "tags": {
+      "name": "tags",
+      "columns": {
+        "name": {
+          "autoincrement": false,
+          "name": "name",
+          "type": "numeric",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "createdAt": {
+          "autoincrement": false,
+          "name": "createdAt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "updatedAt": {
+          "autoincrement": false,
+          "name": "updatedAt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "compositePrimaryKeys": {},
+      "indexes": {},
+      "foreignKeys": {},
+      "uniqueConstraints": {}
+    },
+    "MemeTags": {
+      "name": "MemeTags",
+      "columns": {
+        "memeId": {
+          "autoincrement": false,
+          "name": "memeId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tagName": {
+          "autoincrement": false,
+          "name": "tagName",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "createdAt": {
+          "autoincrement": false,
+          "name": "createdAt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "updatedAt": {
+          "autoincrement": false,
+          "name": "updatedAt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "compositePrimaryKeys": {
+        "MemeTags_memeId_tagName_pk": {
+          "columns": [
+            "memeId",
+            "tagName"
+          ],
+          "name": "MemeTags_memeId_tagName_pk"
         }
       },
       "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
+      "foreignKeys": {
+        "MemeTags_tagName_tags_name_fk": {
+          "name": "MemeTags_tagName_tags_name_fk",
+          "tableFrom": "MemeTags",
+          "tableTo": "tags",
+          "columnsFrom": [
+            "tagName"
+          ],
+          "columnsTo": [
+            "name"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        },
+        "MemeTags_memeId_memes_id_fk": {
+          "name": "MemeTags_memeId_memes_id_fk",
+          "tableFrom": "MemeTags",
+          "tableTo": "memes",
+          "columnsFrom": [
+            "memeId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
       "uniqueConstraints": {}
     }
   },

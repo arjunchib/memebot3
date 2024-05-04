@@ -1,8 +1,8 @@
 import {
   slashCommand,
   string,
-  type InteractionTypes,
   createCommands,
+  type inferInteraction,
 } from "peach";
 
 export const commands = createCommands({
@@ -19,7 +19,10 @@ export const commands = createCommands({
     play: slashCommand({
       description: "plays a meme",
       options: {
-        name: string("name of meme"),
+        name: string("name of meme", {
+          autocomplete: true,
+          // required: true,
+        }),
       },
     }),
   },
@@ -27,4 +30,4 @@ export const commands = createCommands({
   message: {},
 });
 
-export type Interactions = InteractionTypes<typeof commands>;
+export type Interactions = inferInteraction<typeof commands>;

@@ -176,3 +176,6 @@ dist
 
 .peach
 test.webm
+memebot.sqlite
+memebot.sqlite-shm
+memebot.sqlite-wal
