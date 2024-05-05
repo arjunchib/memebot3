@@ -1,8 +1,8 @@
 import { joinVoice } from "peach";
 import type { Interactions } from "../commands";
-import { db } from "../database";
+import { db } from "../db/database";
 import { eq, like } from "drizzle-orm";
-import { commands, memes } from "../schema";
+import { commands, memes } from "../db/schema";
 
 export class MemeController {
   async add(interaction: Interactions["slash"]["add"]) {

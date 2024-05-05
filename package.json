@@ -5,10 +5,10 @@
   "scripts": {
     "start": "bun ./src/index.ts",
     "generate": "drizzle-kit generate:sqlite",
-    "migrate": "bun ./src/migrate.ts",
+    "migrate": "bun ./src/db/migrate.ts",
     "studio": "drizzle-kit studio",
     "drop": "drizzle-kit drop",
-    "seed": "bun ./src/seed.ts"
+    "seed": "bun ./src/db/seed.ts"
   },
   "devDependencies": {
     "@types/bun": "latest",

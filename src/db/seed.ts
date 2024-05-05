@@ -1,5 +1,5 @@
 import { db } from "./database";
-import { db as dbLegacy } from "../legacy-db/database";
+import { db as dbLegacy } from "../../legacy-db/database";
 import { commands, memeTags, memes, tags } from "./schema";
 
 async function syncMemes() {
