@@ -1,76 +1,82 @@
-import { relations } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 import {
-  sqliteTable,
-  numeric,
-  real,
   integer,
+  real,
+  sqliteTable,
+  text,
   primaryKey,
 } from "drizzle-orm/sqlite-core";
 
-export const sequelizeMeta = sqliteTable("SequelizeMeta", {
-  name: numeric("name").primaryKey().notNull(),
-});
-
 export const memes = sqliteTable("memes", {
-  id: numeric("id").primaryKey().notNull(),
-  name: numeric("name").notNull(),
-  createdAt: numeric("createdAt").notNull(),
-  updatedAt: numeric("updatedAt").notNull(),
-  duration: real("duration"),
-  size: integer("size"),
-  bitRate: integer("bit_rate"),
-  loudnessI: real("loudness_i"),
-  loudnessLra: real("loudness_lra"),
-  loudnessTp: real("loudness_tp"),
-  loudnessThresh: real("loudness_thresh"),
-  authorId: numeric("author_id"),
-  playCount: integer("playCount").default(0).notNull(),
-  randomPlayCount: integer("randomPlayCount").default(0).notNull(),
+  id: text("id").primaryKey().notNull(),
+  name: text("name").notNull(),
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`(unixepoch())`),
+  updatedAt: integer("updated_at", { mode: "timestamp" })
+    .notNull()
+    .$onUpdate(() => sql`(unixepoch())`),
+  duration: real("duration").notNull(),
+  size: integer("size").notNull(),
+  bitRate: integer("bit_rate").notNull(),
+  loudnessI: real("loudness_i").notNull(),
+  loudnessLra: real("loudness_lra").notNull(),
+  loudnessTp: real("loudness_tp").notNull(),
+  loudnessThresh: real("loudness_thresh").notNull(),
+  authorId: text("author_id"),
+  playCount: integer("play_count").notNull().default(0),
+  randomPlayCount: integer("random_play_count").notNull().default(0),
 });
 
 export const commands = sqliteTable("commands", {
-  name: numeric("name").primaryKey().notNull(),
-  memeId: integer("memeId").references(() => memes.id, {
-    onDelete: "cascade",
-    onUpdate: "cascade",
-  }),
-  createdAt: numeric("createdAt").notNull(),
-  updatedAt: numeric("updatedAt").notNull(),
+  name: text("name").primaryKey().notNull(),
+  memeId: text("meme_id")
+    .notNull()
+    .references(() => memes.id, {
+      onDelete: "cascade",
+      onUpdate: "cascade",
+    }),
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`(unixepoch())`),
+  updatedAt: integer("updated_at", { mode: "timestamp" })
+    .notNull()
+    .$onUpdate(() => sql`(unixepoch())`),
 });
 
-export const commandsRelations = relations(commands, ({ one }) => ({
-  meme: one(memes, {
-    fields: [commands.memeId],
-    references: [memes.id],
-  }),
-}));
-
 export const tags = sqliteTable("tags", {
-  name: numeric("name").primaryKey().notNull(),
-  createdAt: numeric("createdAt").notNull(),
-  updatedAt: numeric("updatedAt").notNull(),
+  name: text("name").primaryKey().notNull(),
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`(unixepoch())`),
+  updatedAt: integer("updated_at", { mode: "timestamp" })
+    .notNull()
+    .$onUpdate(() => sql`(unixepoch())`),
 });
 
 export const memeTags = sqliteTable(
-  "MemeTags",
+  "meme_tags",
   {
-    memeId: integer("memeId")
+    memeId: text("meme_id")
       .notNull()
       .references(() => memes.id, { onDelete: "cascade", onUpdate: "cascade" }),
-    tagName: numeric("tagName")
+    tagName: text("tag_name")
       .notNull()
       .references(() => tags.name, {
         onDelete: "cascade",
         onUpdate: "cascade",
       }),
-    createdAt: numeric("createdAt").notNull(),
-    updatedAt: numeric("updatedAt").notNull(),
+    createdAt: integer("created_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(unixepoch())`),
+    updatedAt: integer("updated_at", { mode: "timestamp" })
+      .notNull()
+      .$onUpdate(() => sql`(unixepoch())`),
   },
   (table) => {
     return {
-      pk0: primaryKey({
+      pk: primaryKey({
         columns: [table.memeId, table.tagName],
-        name: "MemeTags_memeId_tagName_pk",
       }),
     };
   }

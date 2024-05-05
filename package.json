@@ -7,18 +7,20 @@
     "generate": "drizzle-kit generate:sqlite",
     "migrate": "bun ./src/migrate.ts",
     "studio": "drizzle-kit studio",
-    "drop": "drizzle-kit drop"
+    "drop": "drizzle-kit drop",
+    "seed": "bun ./src/seed.ts"
   },
   "devDependencies": {
     "@types/bun": "latest",
-    "better-sqlite3": "^9.4.1",
-    "drizzle-kit": "^0.20.14"
+    "better-sqlite3": "^9.6.0",
+    "drizzle-kit": "^0.20.17"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
   },
   "dependencies": {
-    "peach": "link:peach",
-    "drizzle-orm": "^0.30.10"
+    "@libsql/client": "^0.6.0",
+    "drizzle-orm": "^0.30.10",
+    "peach": "link:peach"
   }
 }
