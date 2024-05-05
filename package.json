@@ -19,7 +19,6 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
-    "@libsql/client": "^0.6.0",
     "drizzle-orm": "^0.30.10",
     "peach": "link:peach"
   }
