@@ -1,12 +1,12 @@
 import { joinVoice } from "peach";
 import type { Interactions } from "../commands";
 import { db } from "../db/database";
-import { eq, like } from "drizzle-orm";
+import { eq, like, sql } from "drizzle-orm";
 import { commands, memes } from "../db/schema";
 
 export class MemeController {
   async add(interaction: Interactions["slash"]["add"]) {
-    const { name, url } = interaction.options;
+    const { name, url, start, end } = interaction.options;
     await interaction.respondWith(`Added ${name} with ${url}!`);
   }
 
@@ -34,14 +34,22 @@ export class MemeController {
 
   async autocompletePlay(interaction: Interactions["autocomplete"]["play"]) {
     const name = interaction.options.name.value;
-    const commandResults = await db.query.commands.findMany({
-      where: like(commands.name, `${name}%`),
-      limit: 25,
+    // group by meme so we can collapse commands into one entry
+    const commandResults = await db
+      .select({
+        names: sql<string>`GROUP_CONCAT(${commands.name},';')`,
+      })
+      .from(commands)
+      .where(like(commands.name, `%${name}%`))
+      .groupBy(commands.memeId)
+      .limit(25);
+    const choices = commandResults.map((c) => {
+      const name = c.names.split(";")?.[0];
+      return {
+        name,
+        value: name,
+      };
     });
-    const choices = commandResults.map((c) => ({
-      name: c.name,
-      value: c.name,
-    }));
     await interaction.respondWith(choices);
   }
 }
