@@ -166,12 +166,6 @@ export class ListController {
         name: true,
       },
     });
-    console.log(
-      myTags.map((t) => ({
-        name: t.name,
-        value: t.name,
-      }))
-    );
     await interaction.respondWith(
       myTags.map((t) => ({
         name: t.name,

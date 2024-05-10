@@ -32,7 +32,7 @@ export class MemeController {
     voiceConn.disconnect();
   }
 
-  async autocompletePlay(interaction: Interactions["autocomplete"]["play"]) {
+  async autocompleteName(interaction: Interactions["autocomplete"]["play"]) {
     const name = interaction.options.name.value;
     // group by meme so we can collapse commands into one entry
     const commandResults = await db

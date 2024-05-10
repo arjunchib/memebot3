@@ -73,6 +73,12 @@ export const commands = createCommands({
         }),
       },
     }),
+    info: slashCommand({
+      description: "show info about a meme",
+      options: {
+        name: string("Name of meme", { required: true, autocomplete: true }),
+      },
+    }),
   },
   user: {},
   message: {},

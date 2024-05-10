@@ -12,6 +12,7 @@
   },
   "devDependencies": {
     "@types/bun": "latest",
+    "@types/byte-size": "^8.1.2",
     "better-sqlite3": "^9.6.0",
     "drizzle-kit": "^0.20.17"
   },
@@ -19,6 +20,7 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
+    "byte-size": "^8.1.1",
     "drizzle-orm": "^0.30.10",
     "peach": "link:peach"
   }
