@@ -1,7 +1,8 @@
-import type { Interactions } from "../commands";
+import type { list } from "../commands";
 import { db } from "../db/database";
 import { and, asc, desc, eq, gte, like, lt, lte } from "drizzle-orm";
 import { memeTags, memes, tags } from "../db/schema";
+import type { $slash, $autocomplete } from "peach";
 
 interface Range {
   start: string;
@@ -10,9 +11,9 @@ interface Range {
 }
 
 export class ListController {
-  private interaction?: Interactions["slash"]["list"];
+  private interaction?: $slash<typeof list>;
 
-  async list(interaction: Interactions["slash"]["list"]) {
+  async list(interaction: $slash<typeof list>) {
     this.interaction = interaction;
     const filters = and(
       this.authorFilter(),
@@ -157,7 +158,7 @@ export class ListController {
     }
   }
 
-  async listAutocomplete(interaction: Interactions["autocomplete"]["list"]) {
+  async listAutocomplete(interaction: $autocomplete<typeof list>) {
     const tag = interaction.options.tag?.value;
     const myTags = await db.query.tags.findMany({
       where: like(tags.name, `%${tag}%`),

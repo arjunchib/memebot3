@@ -1,16 +1,16 @@
-import { joinVoice } from "peach";
-import type { Interactions } from "../commands";
+import { joinVoice, type $slash, type $autocomplete } from "peach";
+import type { add, play } from "../commands";
 import { db } from "../db/database";
 import { eq, like, sql } from "drizzle-orm";
-import { commands, memes } from "../db/schema";
+import { commands } from "../db/schema";
 
 export class MemeController {
-  async add(interaction: Interactions["slash"]["add"]) {
+  async add(interaction: $slash<typeof add>) {
     const { name, url, start, end } = interaction.options;
     await interaction.respondWith(`Added ${name} with ${url}!`);
   }
 
-  async play(interaction: Interactions["slash"]["play"]) {
+  async play(interaction: $slash<typeof play>) {
     const { name } = interaction.options;
     const command = await db.query.commands.findFirst({
       where: eq(commands.name, name),
@@ -32,7 +32,7 @@ export class MemeController {
     voiceConn.disconnect();
   }
 
-  async autocompleteName(interaction: Interactions["autocomplete"]["play"]) {
+  async autocompleteName(interaction: $autocomplete<typeof play>) {
     const name = interaction.options.name.value;
     // group by meme so we can collapse commands into one entry
     const commandResults = await db

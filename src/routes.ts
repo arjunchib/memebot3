@@ -1,15 +1,23 @@
-import { Route } from "peach";
+import { Route, autocompleteRoute, commandRoute } from "peach";
 import { MemeController } from "./controllers/meme_controller";
-import { commands } from "./commands";
+import { add, edit, info, list, play } from "./commands";
 import { ListController } from "./controllers/list_controller";
 import { InfoController } from "./controllers/info_controller";
+import { EditController } from "./controllers/edit_controller";
 
 export const routes: Route[] = [
-  commands.slash.add.routeTo(MemeController, "add"),
-  commands.slash.play.routeTo(MemeController, "play"),
-  commands.slash.play.autocomplete.routeTo(MemeController, "autocompleteName"),
-  commands.slash.list.routeTo(ListController, "list"),
-  commands.slash.list.autocomplete.routeTo(ListController, "listAutocomplete"),
-  commands.slash.info.routeTo(InfoController, "info"),
-  commands.slash.info.autocomplete.routeTo(MemeController, "autocompleteName"),
+  commandRoute(add).to(MemeController, "add"),
+  commandRoute(play).to(MemeController, "play"),
+  commandRoute(list).to(ListController, "list"),
+  commandRoute(info).to(InfoController, "info"),
+
+  commandRoute(edit, "tag", "add1").to(EditController, "addTag"),
+  commandRoute(edit, "tag", "add1").to(EditController, "removeTag"),
+  commandRoute(edit, "command", "add").to(EditController, "addCommand"),
+  commandRoute(edit, "command", "remove").to(EditController, "removeCommand"),
+  commandRoute(edit, "rename").to(EditController, "rename"),
+
+  autocompleteRoute(play).to(MemeController, "autocompleteName"),
+  autocompleteRoute(list).to(ListController, "list"),
+  autocompleteRoute(info).to(MemeController, "autocompleteName"),
 ];

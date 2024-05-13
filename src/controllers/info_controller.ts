@@ -1,16 +1,17 @@
 import { eq } from "drizzle-orm";
-import { type Interactions } from "../commands";
 import { db } from "../db/database";
 import { commands } from "../db/schema";
 import { default as byteSize } from "byte-size";
 import { DiscordRestService, inject } from "peach";
 import type { EmbedAuthor } from "peach/lib/interfaces/embed";
+import type { $slash } from "peach";
+import type { info } from "../commands";
 
 export class InfoController {
   private http = inject(DiscordRestService);
 
-  async info(interaction: Interactions["slash"]["info"]) {
-    const name = interaction.options.name;
+  async info(interaction: $slash<typeof info>) {
+    const name = interaction.options.meme;
     const command = await db.query.commands.findFirst({
       where: eq(commands.name, name),
       with: {
