@@ -11,8 +11,8 @@ export const routes: Route[] = [
   commandRoute(list).to(ListController, "list"),
   commandRoute(info).to(InfoController, "info"),
 
-  commandRoute(edit, "tag", "add1").to(EditController, "addTag"),
-  commandRoute(edit, "tag", "add1").to(EditController, "removeTag"),
+  commandRoute(edit, "tag", "add").to(EditController, "addTag"),
+  commandRoute(edit, "tag", "remove").to(EditController, "removeTag"),
   commandRoute(edit, "command", "add").to(EditController, "addCommand"),
   commandRoute(edit, "command", "remove").to(EditController, "removeCommand"),
   commandRoute(edit, "rename").to(EditController, "rename"),

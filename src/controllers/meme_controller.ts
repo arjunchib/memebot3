@@ -33,7 +33,7 @@ export class MemeController {
   }
 
   async autocompleteName(interaction: $autocomplete<typeof play>) {
-    const name = interaction.options.name.value;
+    const name = interaction.options.name?.value;
     // group by meme so we can collapse commands into one entry
     const commandResults = await db
       .select({
