@@ -151,27 +151,10 @@ export class ListController {
         return desc(memes.duration);
       case "shortest":
         return asc(memes.duration);
-      case "most_played":
+      case "most played":
         return desc(memes.playCount);
-      case "least_played":
+      case "least played":
         return asc(memes.playCount);
     }
-  }
-
-  async listAutocomplete(interaction: $autocomplete<typeof list>) {
-    const tag = interaction.options.tag?.value;
-    const myTags = await db.query.tags.findMany({
-      where: like(tags.name, `%${tag}%`),
-      limit: 25,
-      columns: {
-        name: true,
-      },
-    });
-    await interaction.respondWith(
-      myTags.map((t) => ({
-        name: t.name,
-        value: t.name,
-      }))
-    );
   }
 }
