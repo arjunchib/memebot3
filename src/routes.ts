@@ -31,6 +31,8 @@ export const routes: Route[] = [
 
   // Edit
   commandRoute(addTag).to(EditController, "addTag"),
+  autocompleteRoute(addTag).focus("tag").to(AutocompleteController, "tags"),
+  autocompleteRoute(addTag).focus("meme").to(AutocompleteController, "name"),
   commandRoute(removeTag).to(EditController, "removeTag"),
   commandRoute(addCommand).to(EditController, "addCommand"),
   commandRoute(removeCommand).to(EditController, "removeCommand"),
