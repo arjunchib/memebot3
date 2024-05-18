@@ -1,10 +1,17 @@
 import type { $slash } from "peach";
-import type { edit } from "../commands";
+import type {
+  addCommand,
+  addTag,
+  edit,
+  removeCommand,
+  removeTag,
+  rename,
+} from "../commands";
 
 export class EditController {
-  addTag(interaction: $slash<typeof edit>) {}
-  removeTag(interaction: $slash<typeof edit>) {}
-  addCommand(interaction: $slash<typeof edit>) {}
-  removeCommand(interaction: $slash<typeof edit>) {}
-  rename(interaction: $slash<typeof edit>) {}
+  addTag(interaction: $slash<typeof addTag>) {}
+  removeTag(interaction: $slash<typeof removeTag>) {}
+  addCommand(interaction: $slash<typeof addCommand>) {}
+  removeCommand(interaction: $slash<typeof removeCommand>) {}
+  rename(interaction: $slash<typeof rename>) {}
 }

@@ -1,5 +1,15 @@
 import { Route, autocompleteRoute, commandRoute } from "peach";
-import { add, edit, info, list, play } from "./commands";
+import {
+  add,
+  addCommand,
+  addTag,
+  info,
+  list,
+  play,
+  removeCommand,
+  removeTag,
+  rename,
+} from "./commands";
 import { ListController } from "./controllers/list_controller";
 import { InfoController } from "./controllers/info_controller";
 import { EditController } from "./controllers/edit_controller";
@@ -20,11 +30,11 @@ export const routes: Route[] = [
   autocompleteRoute(info).focus("meme").to(AutocompleteController, "name"),
 
   // Edit
-  commandRoute(edit, "tag", "add").to(EditController, "addTag"),
-  commandRoute(edit, "tag", "remove").to(EditController, "removeTag"),
-  commandRoute(edit, "command", "add").to(EditController, "addCommand"),
-  commandRoute(edit, "command", "remove").to(EditController, "removeCommand"),
-  commandRoute(edit, "rename").to(EditController, "rename"),
+  commandRoute(addTag).to(EditController, "addTag"),
+  commandRoute(removeTag).to(EditController, "removeTag"),
+  commandRoute(addCommand).to(EditController, "addCommand"),
+  commandRoute(removeCommand).to(EditController, "removeCommand"),
+  commandRoute(rename).to(EditController, "rename"),
 
   // List
   commandRoute(list).to(ListController, "list"),
