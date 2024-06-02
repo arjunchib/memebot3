@@ -8,14 +8,14 @@ import {
 } from "peach";
 
 export const add = slashCommand("add", "adds a meme").options([
-  string("url", "url to download").required(),
-  string("name", "name of meme").required(),
-  string("start", "start time (from beginning if omitted)"),
-  string("end", "end time (to end if omitted)"),
+  string("url", "URL to download").required(),
+  string("name", "Command for meme").required(),
+  string("start", "Start time (from beginning if omitted)"),
+  string("end", "End time (to end if omitted)"),
 ]);
 
 export const play = slashCommand("play", "plays a meme").options([
-  string("name", "name of meme").autocomplete().required(),
+  string("name", "Command for meme").autocomplete().required(),
 ]);
 
 export const list = slashCommand("list", "list memes").options([
@@ -36,32 +36,32 @@ export const list = slashCommand("list", "list memes").options([
 ]);
 
 export const info = slashCommand("info", "show info about a meme").options([
-  string("meme", "Name of meme").required().autocomplete(),
+  string("meme", "Command for meme").required().autocomplete(),
 ]);
 
 export const addTag = subcommand("add", "Add a tag").options([
-  string("meme", "Name of meme").required().autocomplete(),
-  string("tag", "Tag to add").required().autocomplete(),
+  string("meme", "Command for meme").required().autocomplete(),
+  string("tag", "Tag to add").required(),
 ]);
 
 export const removeTag = subcommand("remove", "Remove a tag").options([
-  string("meme", "Name of meme").required().autocomplete(),
+  string("meme", "Command for meme").required().autocomplete(),
   string("tag", "Tag to remove").required().autocomplete(),
 ]);
 
 export const addCommand = subcommand("add", "Add a command").options([
-  string("meme", "Name of meme").required().autocomplete(),
-  string("command", "Command to add").required().autocomplete(),
+  string("meme", "Command for meme").required().autocomplete(),
+  string("command", "Command to add").required(),
 ]);
 
 export const removeCommand = subcommand("remove", "Remove a command").options([
-  string("meme", "Name of meme").required().autocomplete(),
+  string("meme", "Command for meme").required().autocomplete(),
   string("command", "Command to remove").required().autocomplete(),
 ]);
 
 export const rename = subcommand("rename", "Rename a meme").options([
-  string("meme", "Name of meme").required().autocomplete(),
-  string("tag", "Tag to add").required().autocomplete(),
+  string("meme", "Command for meme").required().autocomplete(),
+  string("name", "New name of meme").required(),
 ]);
 
 export const edit = slashCommand("edit", "edit a meme").options([
