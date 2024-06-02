@@ -23,22 +23,35 @@ export const routes: Route[] = [
 
   // Play
   commandRoute(play).to(PlayController, "play"),
-  autocompleteRoute(play).focus("name").to(AutocompleteController, "name"),
+  autocompleteRoute(play).focus("name").to(AutocompleteController, "meme"),
 
   // Info
   commandRoute(info).to(InfoController, "info"),
-  autocompleteRoute(info).focus("meme").to(AutocompleteController, "name"),
+  autocompleteRoute(info).focus("meme").to(AutocompleteController, "meme"),
 
   // Edit
   commandRoute(addTag).to(EditController, "addTag"),
-  autocompleteRoute(addTag).focus("tag").to(AutocompleteController, "tags"),
-  autocompleteRoute(addTag).focus("meme").to(AutocompleteController, "name"),
+  autocompleteRoute(addTag).focus("meme").to(AutocompleteController, "meme"),
+  autocompleteRoute(addTag).focus("tag").to(AutocompleteController, "tag"),
+
   commandRoute(removeTag).to(EditController, "removeTag"),
+  autocompleteRoute(removeTag).focus("meme").to(AutocompleteController, "meme"),
+  autocompleteRoute(removeTag).focus("tag").to(AutocompleteController, "tag"),
+
   commandRoute(addCommand).to(EditController, "addCommand"),
+  autocompleteRoute(addCommand)
+    .focus("meme")
+    .to(AutocompleteController, "meme"),
+
   commandRoute(removeCommand).to(EditController, "removeCommand"),
+  autocompleteRoute(removeCommand)
+    .focus("meme")
+    .to(AutocompleteController, "meme"),
+
   commandRoute(rename).to(EditController, "rename"),
+  autocompleteRoute(rename).focus("meme").to(AutocompleteController, "meme"),
 
   // List
   commandRoute(list).to(ListController, "list"),
-  autocompleteRoute(list).focus("tag").to(AutocompleteController, "tags"),
+  autocompleteRoute(list).focus("tag").to(AutocompleteController, "tag"),
 ];
