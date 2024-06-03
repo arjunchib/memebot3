@@ -1,4 +1,4 @@
-import { Route, autocompleteRoute, commandRoute } from "peach";
+import { Route, autocompleteRoute, commandRoute, customIdRoute } from "peach";
 import {
   add,
   addCommand,
@@ -20,6 +20,7 @@ import { AutocompleteController } from "./controllers/autocomplete_controller";
 export const routes: Route[] = [
   // Add
   commandRoute(add).to(AddController, "add"),
+  customIdRoute(/save|skip/).to(AddController, "save"),
 
   // Play
   commandRoute(play).to(PlayController, "play"),

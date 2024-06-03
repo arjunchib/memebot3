@@ -1,6 +1,11 @@
 import { bootstrap } from "peach";
 import { commands } from "./commands";
 import { routes } from "./routes";
+import { mkdirSync } from "fs";
+
+try {
+  mkdirSync("audio");
+} catch {}
 
 await bootstrap({
   applicationId: Bun.env.APPLICATION_ID!,

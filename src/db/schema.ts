@@ -8,7 +8,10 @@ import {
 } from "drizzle-orm/sqlite-core";
 
 export const memes = sqliteTable("memes", {
-  id: text("id").primaryKey().notNull(),
+  id: text("id")
+    .primaryKey()
+    .notNull()
+    .$default(() => crypto.randomUUID()),
   name: text("name").notNull(),
   createdAt: integer("created_at", { mode: "timestamp" })
     .notNull()
