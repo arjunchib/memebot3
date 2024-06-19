@@ -14,14 +14,14 @@
     "@types/bun": "latest",
     "@types/byte-size": "^8.1.2",
     "better-sqlite3": "^9.6.0",
-    "drizzle-kit": "^0.21.1"
+    "drizzle-kit": "^0.22.0"
   },
   "peerDependencies": {
     "typescript": "^5.4.5"
   },
   "dependencies": {
     "byte-size": "^8.1.1",
-    "drizzle-orm": "^0.30.10",
+    "drizzle-orm": "^0.31.0",
     "peach": "link:peach",
     "ytdl-core": "^4.11.5"
   }

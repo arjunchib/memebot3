@@ -9,8 +9,6 @@ import type { add } from "../commands";
 import { ffmpeg } from "../ffmpeg";
 import ytdl from "ytdl-core";
 
-let token = "";
-
 export class AddController {
   private discordRestService = inject(DiscordRestService);
 
@@ -23,7 +21,6 @@ export class AddController {
     const saveBtn = button("Save").primary().customId("save");
     const skipBtn = button("Skip").secondary().customId("skip");
     await interaction.followupWith([[saveBtn, skipBtn]]);
-    token = interaction.token;
   }
 
   async save(interaction: ComponentInteraction) {
