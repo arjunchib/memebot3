@@ -1,6 +1,11 @@
 import { db } from "./database";
 import { db as dbLegacy } from "../../legacy-db/database";
 import { commands, memeTags, memes, tags } from "./schema";
+import { bucket } from "../bucket";
+import { Pool } from "../pool";
+
+const keys = await bucket.listKeys();
+let totalUploaded = 0;
 
 async function syncMemes() {
   console.log("Syncing memes");
@@ -93,7 +98,34 @@ async function syncMemeTags() {
   console.log(await db.query.memeTags.findFirst());
 }
 
+async function syncObjects() {
+  console.log("Syncing bucket objects");
+  const myMemes = await db.query.memes.findMany({
+    columns: { id: true },
+  });
+  const tasks = myMemes.flatMap((meme) => [
+    syncObject(`audio/${meme.id}.webm`, `audio/${meme.id}.webm`),
+    syncObject(`waveforms/${meme.id}.png`, `waveform/${meme.id}.png`),
+  ]);
+  const pool = new Pool(tasks);
+  await pool.concurrent(8);
+  console.log(`Uploaded ${totalUploaded} objects`);
+}
+
+function syncObject(oldFile: string, newFile: string) {
+  return async () => {
+    if (!keys.includes(newFile)) {
+      const res = await fetch(`${Bun.env.OLD_BUCKET!}/${oldFile}`);
+      if (res.body) {
+        await bucket.upload(newFile, res.body);
+        totalUploaded++;
+      }
+    }
+  };
+}
+
 await syncMemes();
 await syncCommands();
 await syncTags();
 await syncMemeTags();
+await syncObjects();

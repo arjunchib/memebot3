@@ -22,7 +22,9 @@ export class PlayController {
       self_deaf: true,
       self_mute: false,
     });
-    const url = `${Bun.env.BUCKET!}/audio/${meme.id}.webm`;
+    const url = `${Bun.env.BUCKET_ENDPOINT}/${Bun.env.BUCKET!}/audio/${
+      meme.id
+    }.webm`;
     await voiceConn.playAudio(await fetch(url));
     voiceConn.disconnect();
   }
