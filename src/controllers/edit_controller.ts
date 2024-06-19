@@ -13,7 +13,7 @@ import { commands, memeTags, memes, tags } from "../db/schema";
 
 export class EditController {
   async addTag(interaction: $slash<typeof addTag>) {
-    const { meme, tag } = interaction.options;
+    const { meme, tag } = interaction.options();
     const memeId = await this.findMeme(meme);
     await db.transaction(async (tx) => {
       await tx.insert(tags).values({ name: tag }).onConflictDoNothing();
@@ -25,7 +25,7 @@ export class EditController {
   }
 
   async removeTag(interaction: $slash<typeof removeTag>) {
-    const { meme, tag } = interaction.options;
+    const { meme, tag } = interaction.options();
     const memeId = await this.findMeme(meme);
     await db
       .delete(memeTags)
@@ -33,7 +33,7 @@ export class EditController {
   }
 
   async addCommand(interaction: $slash<typeof addCommand>) {
-    const { meme, command } = interaction.options;
+    const { meme, command } = interaction.options();
     const memeId = await this.findMeme(meme);
     await db.insert(commands).values({
       name: command,
@@ -42,7 +42,7 @@ export class EditController {
   }
 
   async removeCommand(interaction: $slash<typeof removeCommand>) {
-    const { meme, command } = interaction.options;
+    const { meme, command } = interaction.options();
     const memeId = await this.findMeme(meme);
     await db.insert(commands).values({
       name: command,
@@ -51,12 +51,12 @@ export class EditController {
   }
 
   async rename(interaction: $slash<typeof rename>) {
-    const { meme, name } = interaction.options;
+    const { meme, name } = interaction.options();
     await db.update(memes).set({ name }).where(eq(memes.name, meme));
   }
 
   async removeTagAutocomplete(interaction: $autocomplete<typeof removeTag>) {
-    const commandName = interaction.options.meme;
+    const commandName = interaction.options().meme;
     const myCommand = await db.query.commands.findFirst({
       where: eq(commands.name, commandName),
       with: {
@@ -78,7 +78,7 @@ export class EditController {
   async removeCommandAutocomplete(
     interaction: $autocomplete<typeof removeCommand>
   ) {
-    const commandName = interaction.options.meme;
+    const commandName = interaction.options().meme;
     const myCommand = await db.query.commands.findFirst({
       where: eq(commands.name, commandName),
       with: {

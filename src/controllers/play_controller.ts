@@ -6,7 +6,7 @@ import { commands } from "../db/schema";
 
 export class PlayController {
   async play(interaction: $slash<typeof play>) {
-    const { name } = interaction.options;
+    const { name } = interaction.options();
     const command = await db.query.commands.findFirst({
       where: eq(commands.name, name),
       with: { meme: { columns: { id: true, name: true } } },

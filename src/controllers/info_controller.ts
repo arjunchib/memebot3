@@ -11,7 +11,7 @@ export class InfoController {
   private http = inject(DiscordRestService);
 
   async info(interaction: $slash<typeof info>) {
-    const name = interaction.options.meme;
+    const name = interaction.options().meme;
     const command = await db.query.commands.findFirst({
       where: eq(commands.name, name),
       with: {

@@ -15,7 +15,7 @@ export class AddController {
   private discordRestService = inject(DiscordRestService);
 
   async add(interaction: $slash<typeof add>) {
-    const { name, url: youtubeUrl, start, end } = interaction.options;
+    const { name, url: youtubeUrl, start, end } = interaction.options();
     // const id = crypto.randomUUID();
     // const audioUrl = await this.getAudioUrl(youtubeUrl);
     // await this.downloadAudio(audioUrl, id, start, end);
@@ -23,23 +23,21 @@ export class AddController {
     const saveBtn = button("Save").primary().customId("save");
     const skipBtn = button("Skip").secondary().customId("skip");
     await interaction.followupWith([[saveBtn, skipBtn]]);
-    token = interaction.raw.token;
+    token = interaction.token;
   }
 
   async save(interaction: ComponentInteraction) {
-    const customId = interaction.raw.data?.custom_id;
-    if (customId === "save") {
-      await interaction.respondWith({ content: "Saved", components: [] });
-    } else {
-      await interaction.respondWith({ content: "Skipped", components: [] });
-    }
+    await interaction.respondWith({ content: "Saved", components: [] });
     const messageId =
-      interaction.raw.message?.interaction_metadata
-        .original_response_message_id;
-    const channelId = interaction.raw.message?.channel_id;
+      interaction.message?.interaction_metadata.original_response_message_id;
+    const channelId = interaction.message?.channel_id;
     await this.discordRestService.editMessage(channelId!, messageId, {
       content: "Added",
     });
+  }
+
+  async skip(interaction: ComponentInteraction) {
+    await interaction.respondWith({ content: "Skipped", components: [] });
   }
 
   private async getAudioUrl(youtubeUrl: string) {

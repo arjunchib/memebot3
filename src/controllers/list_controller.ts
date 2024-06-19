@@ -32,8 +32,8 @@ export class ListController {
       .from(memes)
       .where(filters)
       .orderBy(this.orderBy())
-      .limit(interaction.options.limit || 10);
-    const filteredMemes = interaction.options.tag
+      .limit(interaction.options().limit || 10);
+    const filteredMemes = interaction.options().tag
       ? query.innerJoin(memeTags, eq(memes.id, memeTags.memeId)).all()
       : query.all();
     await interaction.respondWith(
@@ -57,17 +57,17 @@ export class ListController {
   }
 
   private authorFilter() {
-    const author = this.interaction?.options.author;
+    const author = this.interaction?.options().author;
     return author ? eq(memes.authorId, author.id) : undefined;
   }
 
   private tagFilter() {
-    const tag = this.interaction?.options.tag;
+    const tag = this.interaction?.options().tag;
     return tag ? eq(memeTags.tagName, tag) : undefined;
   }
 
   private createdFilters() {
-    const range = this.parseRange(this.interaction?.options.created);
+    const range = this.parseRange(this.interaction?.options().created);
     if (!range) return [];
     const filters = [];
     if (range.start) {
@@ -85,7 +85,7 @@ export class ListController {
   }
 
   private durationFilters() {
-    const range = this.parseRange(this.interaction?.options.duration);
+    const range = this.parseRange(this.interaction?.options().duration);
     if (!range) return [];
     const filters = [];
     if (range.start) {
@@ -103,7 +103,7 @@ export class ListController {
   }
 
   private playsFilters() {
-    const range = this.parseRange(this.interaction?.options.plays);
+    const range = this.parseRange(this.interaction?.options().plays);
     if (!range) return [];
     const filters = [];
     if (range.start) {
@@ -140,7 +140,7 @@ export class ListController {
   }
 
   private orderBy() {
-    const sort = this.interaction?.options.sort;
+    const sort = this.interaction?.options().sort;
     switch (sort) {
       default:
       case "newest":

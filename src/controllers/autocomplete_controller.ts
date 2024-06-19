@@ -5,7 +5,7 @@ import type { $focus } from "peach";
 
 export class AutocompleteController {
   async meme(interaction: $focus<string>) {
-    const name = interaction.focused;
+    const name = interaction.focus();
     // group by meme so we can collapse commands into one entry
     const commandResults = await db
       .select({
@@ -26,7 +26,7 @@ export class AutocompleteController {
   }
 
   async tag(interaction: $focus<string>) {
-    const tag = interaction.options;
+    const tag = interaction.options();
     const myTags = await db.query.tags.findMany({
       where: like(tags.name, `%${tag}%`),
       limit: 25,
