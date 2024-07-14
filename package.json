@@ -24,7 +24,6 @@
     "@aws-sdk/lib-storage": "^3.600.0",
     "byte-size": "^8.1.1",
     "drizzle-orm": "^0.31.0",
-    "peach": "link:peach",
-    "ytdl-core": "^4.11.5"
+    "peach": "link:peach"
   }
 }

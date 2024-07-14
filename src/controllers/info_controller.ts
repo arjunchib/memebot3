@@ -104,7 +104,9 @@ export class InfoController {
           fields,
           color: (247 << 16) + (212 << 8) + 87,
           image: {
-            url: `${Bun.env.BUCKET!}/waveforms/${meme.id}.png`,
+            url: `${Bun.env.BUCKET_ENDPOINT!}/${Bun.env.BUCKET!}/waveform/${
+              meme.id
+            }.png`,
           },
           footer: {
             text: meme.id,

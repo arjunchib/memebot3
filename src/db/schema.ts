@@ -29,6 +29,7 @@ export const memes = sqliteTable("memes", {
   authorId: text("author_id"),
   playCount: integer("play_count").notNull().default(0),
   randomPlayCount: integer("random_play_count").notNull().default(0),
+  sourceUrl: text("source_url"),
 });
 
 export const commands = sqliteTable("commands", {
