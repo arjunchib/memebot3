@@ -1,9 +1,10 @@
 import {
+  DeleteObjectsCommand,
   ListObjectsV2Command,
+  PutObjectCommand,
   S3Client,
   type PutObjectCommandInput,
 } from "@aws-sdk/client-s3";
-import { Upload } from "@aws-sdk/lib-storage";
 
 export class Bucket {
   private client = new S3Client({
@@ -15,21 +16,34 @@ export class Bucket {
     },
   });
 
-  async upload(file: string, stream: PutObjectCommandInput["Body"]) {
-    const req = new Upload({
-      client: this.client,
-      params: {
+  async upload(
+    file: string,
+    data: PutObjectCommandInput["Body"],
+    hash?: string
+  ) {
+    return await this.client.send(
+      new PutObjectCommand({
         Key: file,
         Bucket: Bun.env.BUCKET,
-        Body: stream,
+        Body: data,
         ACL: "public-read",
         ContentType: this.contentType(file),
-      },
-    });
-    return req.done();
+        ContentMD5: hash,
+      })
+    );
   }
 
-  async listKeys() {
+  async delete(keys: string[]) {
+    const Objects = keys.map((Key) => ({ Key }));
+    return await this.client.send(
+      new DeleteObjectsCommand({
+        Bucket: Bun.env.BUCKET,
+        Delete: { Objects },
+      })
+    );
+  }
+
+  async listObjects() {
     const keys = [];
     let done = false;
     let continuationToken: string | undefined;
@@ -41,9 +55,12 @@ export class Bucket {
         })
       );
       done = !res.IsTruncated;
-      continuationToken = res.ContinuationToken;
+      continuationToken = res.NextContinuationToken;
       const moreKeys =
-        res.Contents?.map((content) => content.Key).filter(Boolean) || [];
+        res.Contents?.filter((content) => content.Key).map((content) => ({
+          etag: content.ETag,
+          key: content.Key!,
+        })) || [];
       keys.push(...moreKeys);
     }
     return keys;

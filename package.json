@@ -5,7 +5,9 @@
   "scripts": {
     "start": "bun --hot ./src/index.ts",
     "db": "drizzle-kit",
-    "seed": "bun ./src/db/seed.ts"
+    "seed": "bun ./src/seed.ts",
+    "build": "bun build ./src/index.ts --compile --target=bun-linux-x64-modern --outfile mb-serve && bun build ./src/seed.ts --compile --target=bun-linux-x64-modern --outfile mb-seed",
+    "deploy": "rsync -azP --delete --include='mb-seed' --include='mb-serve' --include='memebot-legacy.sqlite' --include='drizzle' --include='drizzle.config.ts' --exclude='*' ./ atl1:~/memebot/"
   },
   "devDependencies": {
     "@types/bun": "latest",
@@ -18,7 +20,6 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.600.0",
-    "@aws-sdk/lib-storage": "^3.600.0",
     "byte-size": "^8.1.1",
     "drizzle-orm": "^0.32.0",
     "peach": "link:peach"

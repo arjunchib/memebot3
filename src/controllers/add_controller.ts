@@ -13,7 +13,7 @@ import { bucket } from "../bucket";
 import { db } from "../db/database";
 import { commands, memes } from "../db/schema";
 import { unlink } from "fs/promises";
-import { kv } from "../db/kv";
+import { kv } from "../kv";
 import { eq } from "drizzle-orm";
 
 interface ProvisionalMeme {

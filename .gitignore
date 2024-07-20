@@ -176,7 +176,9 @@ dist
 
 .peach
 test.webm
-memebot.sqlite
-memebot.sqlite-shm
-memebot.sqlite-wal
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
 audio
+mb-serve
+mb-seed

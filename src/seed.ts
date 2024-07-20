@@ -1,10 +1,11 @@
-import { db } from "./database";
-import { db as dbLegacy } from "../../legacy-db/database";
-import { commands, memeTags, memes, tags } from "./schema";
-import { bucket } from "../bucket";
-import { Pool } from "../pool";
+import { db } from "./db/database";
+import { dbLegacy } from "./legacy-db/database";
+import { commands, memeTags, memes, tags } from "./db/schema";
+import { bucket } from "./bucket";
+import { Pool } from "./pool";
 
-const keys = await bucket.listKeys();
+console.log("Getting objects");
+const bucketObjects = await bucket.listObjects();
 let totalUploaded = 0;
 
 async function syncMemes() {
@@ -103,6 +104,22 @@ async function syncObjects() {
   const myMemes = await db.query.memes.findMany({
     columns: { id: true },
   });
+  const keys = myMemes.flatMap((meme) => [
+    [`audio/${meme.id}.webm`, `audio/${meme.id}.webm`] as [string, string],
+    [`waveforms/${meme.id}.png`, `waveform/${meme.id}.png`] as [string, string],
+  ]);
+  const allowedKeys = keys.map((key) => key[1]);
+  const keysToRemove = bucketObjects
+    .filter((obj) => !allowedKeys.includes(obj.key))
+    .map((obj) => obj.key);
+  if (keysToRemove.length > 0) {
+    const deleteRes = await bucket.delete(keysToRemove);
+    console.log(
+      `Deleted ${deleteRes.Deleted?.length ?? 0} objects out of ${
+        keysToRemove.length
+      }`
+    );
+  }
   const tasks = myMemes.flatMap((meme) => [
     syncObject(`audio/${meme.id}.webm`, `audio/${meme.id}.webm`),
     syncObject(`waveforms/${meme.id}.png`, `waveform/${meme.id}.png`),
@@ -114,10 +131,16 @@ async function syncObjects() {
 
 function syncObject(oldFile: string, newFile: string) {
   return async () => {
-    if (!keys.includes(newFile)) {
+    if (!bucketObjects.find((obj) => obj.key === newFile)) {
       const res = await fetch(`${Bun.env.OLD_BUCKET!}/${oldFile}`);
-      if (res.body) {
-        await bucket.upload(newFile, res.body);
+      const data = await res.arrayBuffer();
+      const hasher = new Bun.CryptoHasher("md5");
+      hasher.update(data);
+      const hash = hasher.digest("base64");
+      if (
+        bucketObjects.find((obj) => obj.key === newFile && obj.etag !== hash)
+      ) {
+        await bucket.upload(newFile, new Uint8Array(data), hash);
         totalUploaded++;
       }
     }
