@@ -1,6 +1,8 @@
 export async function ffmpeg(...args: string[]) {
-  const proc = Bun.spawn(["ffmpeg", "-hide_banner", "-y", ...args]);
-  return await new Response(proc.stdout).text();
+  const proc = Bun.spawn(["ffmpeg", "-hide_banner", "-y", ...args], {
+    stderr: "pipe",
+  });
+  return await Bun.readableStreamToText(proc.stderr);
 }
 
 export async function ffprobe(...args: string[]) {
@@ -38,7 +40,7 @@ export async function ytdlp(options: {
     "--downloader-args",
     "ffmpeg:-c:a libopus",
     "--print",
-    "webpage_url",
+    "webpage_url,section_start",
     "--no-simulate",
   ];
   if (options.start || options.end) {
@@ -48,5 +50,7 @@ export async function ytdlp(options: {
   }
   args.push(options.url);
   const proc = Bun.spawn(args);
-  return await new Response(proc.stdout).text();
+  const output = await new Response(proc.stdout).text();
+  const [sourceUrl, startStr] = output.trim().split("\n");
+  return { sourceUrl, startTime: Number(startStr) };
 }

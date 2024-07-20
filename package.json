@@ -4,17 +4,14 @@
   "type": "module",
   "scripts": {
     "start": "bun --hot ./src/index.ts",
-    "generate": "drizzle-kit generate:sqlite",
-    "migrate": "bun ./src/db/migrate.ts",
-    "studio": "drizzle-kit studio",
-    "drop": "drizzle-kit drop",
+    "db": "drizzle-kit",
     "seed": "bun ./src/db/seed.ts"
   },
   "devDependencies": {
     "@types/bun": "latest",
     "@types/byte-size": "^8.1.2",
     "better-sqlite3": "^9.6.0",
-    "drizzle-kit": "^0.22.0"
+    "drizzle-kit": "^0.23.0"
   },
   "peerDependencies": {
     "typescript": "^5.4.5"
@@ -23,7 +20,7 @@
     "@aws-sdk/client-s3": "^3.600.0",
     "@aws-sdk/lib-storage": "^3.600.0",
     "byte-size": "^8.1.1",
-    "drizzle-orm": "^0.31.0",
+    "drizzle-orm": "^0.32.0",
     "peach": "link:peach"
   }
 }

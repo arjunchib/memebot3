@@ -20,8 +20,8 @@ import { AutocompleteController } from "./controllers/autocomplete_controller";
 export const routes: Route[] = [
   // Add
   commandRoute(add).to(AddController, "add"),
-  customIdRoute(/^save-/).to(AddController, "save"),
-  customIdRoute(/^skip-/).to(AddController, "skip"),
+  customIdRoute(/^save:/).to(AddController, "save"),
+  customIdRoute(/^skip:/).to(AddController, "skip"),
 
   // Play
   commandRoute(play).to(PlayController, "play"),

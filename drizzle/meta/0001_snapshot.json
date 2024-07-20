@@ -1,6 +1,8 @@
 {
   "version": "6",
   "dialect": "sqlite",
+  "id": "171b00f2-06d0-4d24-a040-88450eebdbb8",
+  "prevId": "b86e1e55-c15b-4ac2-8a26-ec055cc88ecb",
   "tables": {
     "commands": {
       "name": "commands",
@@ -40,17 +42,40 @@
         "commands_meme_id_memes_id_fk": {
           "name": "commands_meme_id_memes_id_fk",
           "tableFrom": "commands",
+          "tableTo": "memes",
           "columnsFrom": [
             "meme_id"
           ],
-          "tableTo": "memes",
           "columnsTo": [
             "id"
           ],
-          "onUpdate": "cascade",
-          "onDelete": "cascade"
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
         }
       },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "keyValue": {
+      "name": "keyValue",
+      "columns": {
+        "key": {
+          "name": "key",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "value": {
+          "name": "value",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
@@ -92,28 +117,28 @@
         "meme_tags_meme_id_memes_id_fk": {
           "name": "meme_tags_meme_id_memes_id_fk",
           "tableFrom": "meme_tags",
+          "tableTo": "memes",
           "columnsFrom": [
             "meme_id"
           ],
-          "tableTo": "memes",
           "columnsTo": [
             "id"
           ],
-          "onUpdate": "cascade",
-          "onDelete": "cascade"
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
         },
         "meme_tags_tag_name_tags_name_fk": {
           "name": "meme_tags_tag_name_tags_name_fk",
           "tableFrom": "meme_tags",
+          "tableTo": "tags",
           "columnsFrom": [
             "tag_name"
           ],
-          "tableTo": "tags",
           "columnsTo": [
             "name"
           ],
-          "onUpdate": "cascade",
-          "onDelete": "cascade"
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
         }
       },
       "compositePrimaryKeys": {
@@ -230,6 +255,13 @@
           "notNull": true,
           "autoincrement": false,
           "default": 0
+        },
+        "source_url": {
+          "name": "source_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
         }
       },
       "indexes": {},
@@ -271,9 +303,11 @@
   },
   "enums": {},
   "_meta": {
+    "schemas": {},
     "tables": {},
     "columns": {}
   },
-  "id": "b86e1e55-c15b-4ac2-8a26-ec055cc88ecb",
-  "prevId": "00000000-0000-0000-0000-000000000000"
+  "internal": {
+    "indexes": {}
+  }
 }

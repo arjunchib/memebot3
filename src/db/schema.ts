@@ -85,3 +85,8 @@ export const memeTags = sqliteTable(
     };
   }
 );
+
+export const keyValue = sqliteTable("keyValue", {
+  key: text("key").primaryKey(),
+  value: text("value", { mode: "json" }).notNull(),
+});
