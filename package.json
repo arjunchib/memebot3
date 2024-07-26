@@ -5,9 +5,9 @@
   "scripts": {
     "start": "bun --hot ./src/index.ts",
     "db": "drizzle-kit",
-    "seed": "bun ./src/seed.ts",
-    "build": "bun build ./src/index.ts --compile --target=bun-linux-x64-modern --outfile mb-serve && bun build ./src/seed.ts --compile --target=bun-linux-x64-modern --outfile mb-seed",
-    "deploy": "rsync -azP --delete --include='mb-seed' --include='mb-serve' --include='memebot-legacy.sqlite' --include='drizzle' --include='drizzle.config.ts' --exclude='*' ./ atl1:~/memebot/"
+    "seed": "bun run ./src/db/seed.ts",
+    "build": "bun build ./src/index.ts --env-file=.env.staging --compile --target=bun-linux-x64-modern --outfile mb-serve && bun build ./src/db/seed.ts --env-file=.env.staging --compile --target=bun-linux-x64-modern --outfile mb-seed && bun build ./src/db/migrate.ts --env-file=.env.staging --compile --target=bun-linux-x64-modern --outfile mb-migrate",
+    "deploy": "rsync -azP --include='/mb-seed' --include='/mb-migrate' --include='/mb-serve' --include='/memebot-legacy.sqlite' --include='/drizzle/***' --include='/drizzle/meta/***' --include='/drizzle.config.ts' --exclude='*' ./ atl1:~/memebot/"
   },
   "devDependencies": {
     "@types/bun": "latest",

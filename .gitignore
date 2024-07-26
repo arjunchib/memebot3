@@ -182,3 +182,5 @@ test.webm
 audio
 mb-serve
 mb-seed
+.env.staging
+mb-migrate

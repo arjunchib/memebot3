@@ -1,8 +1,8 @@
-import { db } from "./db/database";
-import { dbLegacy } from "./legacy-db/database";
-import { commands, memeTags, memes, tags } from "./db/schema";
-import { bucket } from "./bucket";
-import { Pool } from "./pool";
+import { db } from "./database";
+import { dbLegacy } from "../legacy-db/database";
+import { commands, memeTags, memes, tags } from "./schema";
+import { bucket } from "../bucket";
+import { Pool } from "../pool";
 
 console.log("Getting objects");
 const bucketObjects = await bucket.listObjects();
