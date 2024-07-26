@@ -23,34 +23,20 @@ export async function ffprobe(...args: string[]) {
   };
 }
 
-export async function ytdlp(options: {
-  url: string;
-  id: string;
-  start?: string;
-  end?: string;
-}) {
+export async function ytdlp(url: string) {
   const args = [
     "yt-dlp",
-    "-f",
-    "ba",
-    "-S",
-    "acodec:opus,aext:webm",
-    "-o",
-    `./audio/${options.id}.webm`,
-    "--downloader-args",
-    "ffmpeg:-c:a libopus",
     "--print",
-    "webpage_url,section_start",
-    "--no-simulate",
+    "webpage_url,urls",
+    "-f",
+    "ba*",
+    "--format-sort-force",
+    "hasaud,acodec:opus,aext:webm,proto:http",
+    url,
   ];
-  if (options.start || options.end) {
-    const start = options.start || "0";
-    const end = options.end || "inf";
-    args.push("--download-sections", `*${start}-${end}`);
-  }
-  args.push(options.url);
+  console.log(args.join(" "));
   const proc = Bun.spawn(args);
   const output = await new Response(proc.stdout).text();
-  const [sourceUrl, startStr] = output.trim().split("\n");
-  return { sourceUrl, startTime: Number(startStr) };
+  const [sourceUrl, audioUrl] = output.trim().split("\n");
+  return { sourceUrl, audioUrl };
 }

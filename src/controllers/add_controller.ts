@@ -49,13 +49,30 @@ export class AddController {
       });
     }
     const id = crypto.randomUUID();
-    const downloadVideoPromise = ytdlp({ url, id, start, end });
     await interaction.defer();
-    const { sourceUrl, startTime } = await downloadVideoPromise;
-    const youtubeBtn = link(
-      "YouTube",
-      `${sourceUrl}&t=${Math.floor(startTime)}s`
+    const { sourceUrl, audioUrl } = await ytdlp(url);
+    const ffmpegArgs = [];
+    if (start) {
+      ffmpegArgs.push("-ss", start);
+    }
+    if (end) {
+      ffmpegArgs.push("-to", end);
+    }
+    ffmpegArgs.push(
+      "-i",
+      audioUrl,
+      "-c:a",
+      "libopus",
+      "-vn",
+      `./audio/${id}.webm`
     );
+    await ffmpeg(...ffmpegArgs);
+    const source = this.source(sourceUrl);
+    let linkUrl = sourceUrl;
+    if (start && source === "YouTube") {
+      linkUrl += `&t=${start}s`;
+    }
+    const sourceBtn = link(source, linkUrl);
     const saveBtn = button("Save").primary().customId(`save:${id}`);
     const skipBtn = button("Skip").secondary().customId(`skip:${id}`);
     await kv.set(`add:${id}`, { name, sourceUrl });
@@ -63,10 +80,20 @@ export class AddController {
       this.play(id),
       interaction.editResponse({
         content: `Previewing *${name}*`,
-        components: [[youtubeBtn]],
+        components: [[sourceBtn]],
       }),
     ]);
     await interaction.followupWith([[saveBtn, skipBtn]]);
+  }
+
+  private source(url: string) {
+    if (url.includes("youtube.com")) {
+      return "YouTube";
+    } else if (url.includes("x.com") || url.includes("twitter.com")) {
+      return "X";
+    } else {
+      return "Unknown";
+    }
   }
 
   private async play(id: string) {
@@ -81,7 +108,7 @@ export class AddController {
   }
 
   async save(interaction: ComponentInteraction) {
-    await interaction.respondWith({ content: "Saving", components: [] });
+    await interaction.respondWith({ content: "Saving...", components: [] });
     const id = this.getCustomId(interaction);
     const provisionalMeme = await kv.get<ProvisionalMeme>(`add:${id}`);
     if (!provisionalMeme) throw new Error("Cannot find meme");
@@ -89,7 +116,7 @@ export class AddController {
     const normalizedFile = `./audio/${id}-normalized.webm`;
     let loudness = await this.loudnorm(file);
     loudness = await this.loudnorm(file, normalizedFile, loudness);
-    await bucket.upload(`audio/${id}.webm`, Bun.file(normalizedFile));
+    await bucket.upload(`audio/${id}.webm`, Bun.file(normalizedFile).readable);
     const stats = await ffprobe(file);
     const [meme] = await db
       .insert(memes)
