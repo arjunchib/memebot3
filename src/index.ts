@@ -9,7 +9,7 @@ try {
   mkdirSync("audio");
 } catch {}
 
-if (process.env.NODE_ENV === "production") {
+if (Bun.env.NODE_ENV === "production") {
   migrate(db, { migrationsFolder: "drizzle" });
 }
 
@@ -18,7 +18,7 @@ await bootstrap({
   token: Bun.env.TOKEN!,
   commands,
   routes,
-  debug: process.env.NODE_ENV !== "production",
+  debug: Bun.env.NODE_ENV !== "production",
   syncCommands: {
     guildId: Bun.env.GUILD_ID!,
   },
