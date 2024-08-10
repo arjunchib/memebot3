@@ -6,8 +6,7 @@
     "start": "bun --hot ./src/index.ts",
     "db": "drizzle-kit",
     "seed": "bun run ./src/db/seed.ts",
-    "build": "bun build ./src/index.ts --env-file=.env.staging --compile --target=bun-linux-x64-modern --outfile mb-serve && bun build ./src/db/seed.ts --env-file=.env.staging --compile --target=bun-linux-x64-modern --outfile mb-seed && bun build ./src/db/migrate.ts --env-file=.env.staging --compile --target=bun-linux-x64-modern --outfile mb-migrate",
-    "deploy": "rsync -azP --include='/mb-seed' --include='/mb-migrate' --include='/mb-serve' --include='/memebot-legacy.sqlite' --include='/drizzle/***' --include='/drizzle/meta/***' --include='/drizzle.config.ts' --exclude='*' ./ atl1:~/memebot/"
+    "migrate": "bun run ./src/db/migrate.ts"
   },
   "devDependencies": {
     "@types/bun": "latest",
