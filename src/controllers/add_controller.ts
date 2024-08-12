@@ -8,13 +8,14 @@ import {
   type $slash,
 } from "peach";
 import { type add } from "../commands";
-import { ffmpeg, ffprobe, ytdlp } from "../cli";
+import { ffprobe } from "../cli";
 import { bucket } from "../bucket";
 import { db } from "../db/database";
 import { commands, memes } from "../db/schema";
 import { unlink } from "fs/promises";
 import { kv } from "../kv";
 import { eq } from "drizzle-orm";
+import { audioService } from "../services/audio_service";
 
 interface ProvisionalMeme {
   name: string;
@@ -48,36 +49,19 @@ export class AddController {
         flags: 64,
       });
     }
-    const id = crypto.randomUUID();
     await interaction.defer();
-    const { sourceUrl, audioUrl } = await ytdlp(url);
-    const ffmpegArgs = [];
-    if (start) {
-      ffmpegArgs.push("-ss", start);
-    }
-    if (end) {
-      ffmpegArgs.push("-to", end);
-    }
-    ffmpegArgs.push(
-      "-i",
-      audioUrl,
-      "-c:a",
-      "libopus",
-      "-vn",
-      `./audio/${id}.webm`
-    );
-    await ffmpeg(...ffmpegArgs);
-    const source = this.source(sourceUrl);
+    const { sourceUrl, id } = await audioService.download(url);
+    const sourceType = this.sourceType(sourceUrl);
     let linkUrl = sourceUrl;
-    if (start && source === "YouTube") {
+    if (start && sourceType === "YouTube") {
       linkUrl += `&t=${start}s`;
     }
-    const sourceBtn = link(source, linkUrl);
+    const sourceBtn = link(sourceType, linkUrl);
     const saveBtn = button("Save").primary().customId(`save:${id}`);
     const skipBtn = button("Skip").secondary().customId(`skip:${id}`);
     await kv.set(`add:${id}`, { name, sourceUrl });
     await Promise.all([
-      this.play(id),
+      audioService.play(id),
       interaction.editResponse({
         content: `Previewing *${name}*`,
         components: [[sourceBtn]],
@@ -86,37 +70,19 @@ export class AddController {
     await interaction.followupWith([[saveBtn, skipBtn]]);
   }
 
-  private source(url: string) {
-    if (url.includes("youtube.com")) {
-      return "YouTube";
-    } else if (url.includes("x.com") || url.includes("twitter.com")) {
-      return "X";
-    } else {
-      return "Unknown";
-    }
-  }
-
-  private async play(id: string) {
-    const voiceConn = await joinVoice({
-      channel_id: Bun.env.CHANNEL_ID!,
-      guild_id: Bun.env.GUILD_ID!,
-      self_deaf: true,
-      self_mute: false,
-    });
-    await voiceConn.playAudio(Bun.file(`./audio/${id}.webm`));
-    voiceConn.disconnect();
-  }
-
   async save(interaction: ComponentInteraction) {
     await interaction.respondWith({ content: "Saving...", components: [] });
     const id = this.getCustomId(interaction);
     const provisionalMeme = await kv.get<ProvisionalMeme>(`add:${id}`);
     if (!provisionalMeme) throw new Error("Cannot find meme");
-    const file = `./audio/${id}.webm`;
-    const normalizedFile = `./audio/${id}-normalized.webm`;
-    let loudness = await this.loudnorm(file);
-    loudness = await this.loudnorm(file, normalizedFile, loudness);
-    await bucket.upload(`audio/${id}.webm`, Bun.file(normalizedFile).readable);
+    const file = audioService.file(id);
+    const normalizedFile = audioService.normalizedFile(id);
+    let loudness = await audioService.loudnorm(id);
+    loudness = await audioService.loudnorm(id, loudness);
+    const uploadPromise = bucket.upload(
+      `audio/${id}.webm`,
+      Bun.file(normalizedFile).readable
+    );
     const stats = await ffprobe(file);
     const [meme] = await db
       .insert(memes)
@@ -135,15 +101,16 @@ export class AddController {
         name: meme.name.toLowerCase(),
       },
     ]);
-    await unlink(file);
-    await unlink(normalizedFile);
-    await interaction.deleteResponse();
+    await Promise.all([unlink(file), unlink(normalizedFile), uploadPromise]);
     const messageId =
       interaction.message?.interaction_metadata.original_response_message_id;
     const channelId = interaction.message?.channel_id;
-    await this.discordRestService.editMessage(channelId!, messageId, {
-      content: `Added *${meme.name}*`,
-    });
+    await Promise.all([
+      interaction.deleteResponse(),
+      this.discordRestService.editMessage(channelId!, messageId, {
+        content: `Added *${meme.name}*`,
+      }),
+    ]);
   }
 
   async skip(interaction: ComponentInteraction) {
@@ -156,41 +123,13 @@ export class AddController {
     return interaction.data.custom_id.split(":")[1];
   }
 
-  private async loudnorm(
-    inputFile: string,
-    outputFile?: string,
-    loudness?: LoudnormResults
-  ): Promise<LoudnormResults> {
-    // Build command
-    let cmd = ["-i", inputFile];
-
-    // Build filter
-    let filter = "loudnorm=I=-23:LRA=7:tp=-2";
-    if (loudness) {
-      filter += `:measured_I=${loudness.input_i}:measured_LRA=${loudness.input_lra}:measured_tp=${loudness.input_tp}:measured_thresh=${loudness.input_thresh}`;
-    }
-    filter += ":print_format=json";
-    cmd.push("-af", filter);
-
-    // Add options
-    if (outputFile) {
-      cmd.push(outputFile);
+  private sourceType(url: string) {
+    if (url.includes("youtube.com")) {
+      return "YouTube";
+    } else if (url.includes("x.com") || url.includes("twitter.com")) {
+      return "X";
     } else {
-      cmd.push("-f", "null", "-");
+      return "Unknown";
     }
-
-    // Run
-    const result = await ffmpeg(...cmd);
-
-    // Parse results
-    const loudnormStr = result.match(/{[\s\S]*}/)?.[0];
-    if (!loudnormStr) throw new Error("Could not parse results");
-    const loudnorm = JSON.parse(loudnormStr);
-    for (const field in loudnorm) {
-      if (field !== "normalization_type") {
-        loudnorm[field] = Number(loudnorm[field]);
-      }
-    }
-    return loudnorm;
   }
 }

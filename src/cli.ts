@@ -38,5 +38,8 @@ export async function ytdlp(url: string) {
   const proc = Bun.spawn(args);
   const output = await new Response(proc.stdout).text();
   const [sourceUrl, audioUrl] = output.trim().split("\n");
+  if (!sourceUrl || !audioUrl) {
+    throw new Error("Could not find audio url");
+  }
   return { sourceUrl, audioUrl };
 }
