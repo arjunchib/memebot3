@@ -3,6 +3,10 @@ import { dbLegacy } from "../legacy-db/database";
 import { commands, memeTags, memes, tags } from "./schema";
 import { bucket } from "../bucket";
 import { Pool } from "../pool";
+import { migrate } from "drizzle-orm/bun-sqlite/migrator";
+
+console.log("Migrating db");
+migrate(db, { migrationsFolder: "drizzle" });
 
 console.log("Getting objects");
 const bucketObjects = await bucket.listObjects();
