@@ -1,15 +1,15 @@
 import { joinVoice, type $slash } from "peach";
 import type { play } from "../commands";
 import { db } from "../db/database";
-import { eq } from "drizzle-orm";
-import { commands } from "../db/schema";
+import { eq, sql } from "drizzle-orm";
+import { commands, memes } from "../db/schema";
 
 export class PlayController {
   async play(interaction: $slash<typeof play>) {
     const { name } = interaction.options();
     const command = await db.query.commands.findFirst({
       where: eq(commands.name, name),
-      with: { meme: { columns: { id: true, name: true } } },
+      with: { meme: { columns: { id: true, name: true, playCount: true } } },
     });
     const meme = command?.meme;
     if (!meme) {
@@ -27,5 +27,13 @@ export class PlayController {
     }.webm`;
     await voiceConn.playAudio(await fetch(url));
     voiceConn.disconnect();
+    await db
+      .update(memes)
+      .set({
+        playCount: meme.playCount + 1,
+        // TODO: remove once this is fixed https://github.com/drizzle-team/drizzle-orm/issues/2388
+        updatedAt: sql`(unixepoch())`,
+      })
+      .where(eq(memes.id, meme.id));
   }
 }
