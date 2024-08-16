@@ -16,6 +16,8 @@ export class Bucket {
     },
   });
 
+  constructor(private bucket: string) {}
+
   async upload(
     file: string,
     data: PutObjectCommandInput["Body"],
@@ -24,7 +26,7 @@ export class Bucket {
     return await this.client.send(
       new PutObjectCommand({
         Key: file,
-        Bucket: Bun.env.BUCKET,
+        Bucket: this.bucket,
         Body: data,
         ACL: "public-read",
         ContentType: this.contentType(file),
@@ -37,7 +39,7 @@ export class Bucket {
     const Objects = keys.map((Key) => ({ Key }));
     return await this.client.send(
       new DeleteObjectsCommand({
-        Bucket: Bun.env.BUCKET,
+        Bucket: this.bucket,
         Delete: { Objects },
       })
     );
@@ -50,7 +52,7 @@ export class Bucket {
     while (!done) {
       const res = await this.client.send(
         new ListObjectsV2Command({
-          Bucket: Bun.env.BUCKET,
+          Bucket: this.bucket,
           ContinuationToken: continuationToken,
         })
       );
@@ -75,4 +77,5 @@ export class Bucket {
   }
 }
 
-export const bucket = new Bucket();
+export const bucket = new Bucket(Bun.env.BUCKET!);
+export const oldBucket = new Bucket(Bun.env.OLD_BUCKET!);

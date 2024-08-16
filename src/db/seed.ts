@@ -1,7 +1,7 @@
 import { db } from "./database";
 import { dbLegacy } from "../legacy-db/database";
 import { commands, memeTags, memes, tags } from "./schema";
-import { bucket } from "../bucket";
+import { bucket, oldBucket } from "../bucket";
 import { Pool } from "../pool";
 import { migrate } from "drizzle-orm/bun-sqlite/migrator";
 
@@ -10,6 +10,7 @@ migrate(db, { migrationsFolder: "drizzle" });
 
 console.log("Getting objects");
 const bucketObjects = await bucket.listObjects();
+const oldBucketObjects = await oldBucket.listObjects();
 let totalUploaded = 0;
 
 async function syncMemes() {
@@ -123,6 +124,8 @@ async function syncObjects() {
         keysToRemove.length
       }`
     );
+  } else {
+    console.log("Nothing to delete");
   }
   const tasks = myMemes.flatMap((meme) => [
     syncObject(`audio/${meme.id}.webm`, `audio/${meme.id}.webm`),
@@ -130,25 +133,32 @@ async function syncObjects() {
   ]);
   const pool = new Pool(tasks);
   await pool.concurrent(8);
-  console.log(`Uploaded ${totalUploaded} objects`);
+  console.log(`\nUploaded ${totalUploaded} objects of ${tasks.length}`);
 }
 
 function syncObject(oldFile: string, newFile: string) {
   return async () => {
-    if (!bucketObjects.find((obj) => obj.key === newFile)) {
-      const res = await fetch(`${Bun.env.OLD_BUCKET!}/${oldFile}`);
-      const data = await res.arrayBuffer();
-      const hasher = new Bun.CryptoHasher("md5");
-      hasher.update(data);
-      const hash = hasher.digest("base64");
-      if (
-        bucketObjects.find((obj) => obj.key === newFile && obj.etag !== hash)
-      ) {
-        await bucket.upload(newFile, new Uint8Array(data), hash);
-        totalUploaded++;
-      }
+    const oldObject = oldBucketObjects.find((obj) => obj.key === oldFile);
+    const newObject = bucketObjects.find((obj) => obj.key === newFile);
+    if (!newObject || oldObject?.etag !== newObject.etag) {
+      await uploadObject(oldFile, newFile);
+      console.write(newObject ? "o" : "x");
+    } else {
+      console.write(".");
     }
   };
+}
+
+async function uploadObject(oldFile: string, newFile: string) {
+  const res = await fetch(
+    `${Bun.env.BUCKET_ENDPOINT}/${Bun.env.OLD_BUCKET!}/${oldFile}`
+  );
+  const data = await res.arrayBuffer();
+  const hasher = new Bun.CryptoHasher("md5");
+  hasher.update(data);
+  const md5Hash = hasher.digest("base64");
+  await bucket.upload(newFile, new Uint8Array(data), md5Hash);
+  totalUploaded++;
 }
 
 await syncMemes();
