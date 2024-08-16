@@ -6,6 +6,7 @@ import {
   info,
   list,
   play,
+  random,
   removeCommand,
   removeTag,
   rename,
@@ -26,6 +27,9 @@ export const routes: Route[] = [
   // Play
   commandRoute(play).to(PlayController, "play"),
   autocompleteRoute(play).focus("name").to(AutocompleteController, "meme"),
+
+  // Random
+  commandRoute(random).to(PlayController, "random"),
 
   // Info
   commandRoute(info).to(InfoController, "info"),
