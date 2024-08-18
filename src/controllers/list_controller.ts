@@ -37,24 +37,22 @@ export class ListController {
     const filteredMemes = interaction.options().tag
       ? query.innerJoin(memeTags, eq(memes.id, memeTags.memeId)).all()
       : query.all();
-    await interaction.respondWith(
-      "```" +
-        filteredMemes
-          .map((meme) => {
-            const createAt = new Intl.DateTimeFormat("en-US", {
-              day: "2-digit",
-              month: "2-digit",
-              year: "2-digit",
-            }).format(meme.createdAt);
-            return `${createAt} ${meme.duration
-              .toFixed(0)
-              .padStart(3)}s ${meme.playCount.toString().padStart(3)} ${
-              meme.name
-            }`;
-          })
-          .join("\n") +
-        "```"
-    );
+    const output =
+      filteredMemes
+        .map((meme) => {
+          const createAt = new Intl.DateTimeFormat("en-US", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "2-digit",
+          }).format(meme.createdAt);
+          return `${createAt} ${meme.duration
+            .toFixed(0)
+            .padStart(3)}s ${meme.playCount.toString().padStart(3)} ${
+            meme.name
+          }`;
+        })
+        .join("\n") || "No memes :(";
+    await interaction.respondWith("```" + output + "```");
   }
 
   private authorFilter() {
