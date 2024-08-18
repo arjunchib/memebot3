@@ -1,8 +1,8 @@
 import type { list } from "../commands";
 import { db } from "../db/database";
-import { and, asc, desc, eq, gte, like, lt, lte } from "drizzle-orm";
-import { memeTags, memes, tags } from "../db/schema";
-import type { $slash, $autocomplete } from "peach";
+import { and, asc, desc, eq, gte, lt, lte } from "drizzle-orm";
+import { memeTags, memes } from "../db/schema";
+import type { $slash } from "peach";
 
 interface Range {
   start: string;
@@ -104,10 +104,11 @@ export class ListController {
 
   private playsFilters() {
     const range = this.parseRange(this.interaction?.options().plays);
+    console.log(range);
     if (!range) return [];
     const filters = [];
     if (range.start) {
-      filters.push(gte(memes.duration, parseInt(range.start)));
+      filters.push(gte(memes.playCount, parseInt(range.start)));
     }
     if (range.end) {
       const end = parseInt(range.end);
