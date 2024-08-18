@@ -3,6 +3,7 @@ import { db } from "../db/database";
 import { and, asc, desc, eq, gte, lt, lte } from "drizzle-orm";
 import { memeTags, memes } from "../db/schema";
 import type { $slash } from "peach";
+import { parseDate } from "../helpers/relative_date";
 
 interface Range {
   start: string;
@@ -67,19 +68,23 @@ export class ListController {
   }
 
   private createdFilters() {
-    const range = this.parseRange(this.interaction?.options().created);
-    if (!range) return [];
+    const value = this.interaction?.options().created;
+    const range = this.parseRange(value);
     const filters = [];
-    if (range.start) {
-      filters.push(gte(memes.createdAt, new Date(range.start)));
-    }
-    if (range.end) {
-      const end = new Date(range.end);
-      if (range.inclusive) {
-        filters.push(lte(memes.createdAt, end));
-      } else {
-        filters.push(lt(memes.createdAt, end));
+    if (range) {
+      if (range.start) {
+        filters.push(gte(memes.createdAt, parseDate(range.start)));
       }
+      if (range.end) {
+        const end = parseDate(range.end);
+        if (range.inclusive) {
+          filters.push(lte(memes.createdAt, end));
+        } else {
+          filters.push(lt(memes.createdAt, end));
+        }
+      }
+    } else if (value) {
+      filters.push(gte(memes.createdAt, parseDate(value.trim())));
     }
     return filters;
   }
