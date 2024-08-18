@@ -26,7 +26,7 @@ export class AutocompleteController {
   }
 
   async tag(interaction: $focus<string>) {
-    const tag = interaction.options();
+    const tag = interaction.focus();
     const myTags = await db.query.tags.findMany({
       where: like(tags.name, `%${tag}%`),
       limit: 25,
