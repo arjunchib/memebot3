@@ -8,12 +8,12 @@ import {
   type $slash,
 } from "peach";
 import { type add } from "../commands";
-import { ffprobe } from "../cli";
-import { bucket } from "../bucket";
+import { ffprobe } from "../helpers/cli";
+import { bucket } from "../services/bucket";
 import { db } from "../db/database";
 import { commands, memes } from "../db/schema";
 import { unlink } from "fs/promises";
-import { kv } from "../kv";
+import { kv } from "../services/kv";
 import { eq } from "drizzle-orm";
 import { audioService } from "../services/audio_service";
 

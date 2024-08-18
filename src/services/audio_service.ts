@@ -1,5 +1,5 @@
 import { joinVoice } from "peach";
-import { ffmpeg, ytdlp } from "../cli";
+import { ffmpeg, ytdlp } from "../helpers/cli";
 
 interface LoudnormResults {
   input_i: number;
