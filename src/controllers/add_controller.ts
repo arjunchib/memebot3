@@ -3,7 +3,6 @@ import {
   DiscordRestService,
   button,
   inject,
-  joinVoice,
   link,
   type $slash,
 } from "peach";
@@ -20,19 +19,7 @@ import { audioService } from "../services/audio_service";
 interface ProvisionalMeme {
   name: string;
   sourceUrl: string;
-}
-
-interface LoudnormResults {
-  input_i: number;
-  input_lra: number;
-  input_tp: number;
-  input_thresh: number;
-  output_i: number;
-  output_tp: number;
-  output_lra: number;
-  output_thresh: number;
-  normalization_type: string;
-  target_offset: number;
+  authorId: string;
 }
 
 export class AddController {
@@ -50,7 +37,7 @@ export class AddController {
       });
     }
     await interaction.defer();
-    const { sourceUrl, id } = await audioService.download(url);
+    const { sourceUrl, id } = await audioService.download(url, { start, end });
     const sourceType = this.sourceType(sourceUrl);
     let linkUrl = sourceUrl;
     if (start && sourceType === "YouTube") {
