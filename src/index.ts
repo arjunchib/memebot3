@@ -18,7 +18,7 @@ await bootstrap({
   token: Bun.env.TOKEN!,
   commands,
   routes,
-  debug: Bun.env.NODE_ENV !== "production",
+  debug: !!Bun.env.DEBUG,
   syncCommands: {
     guildId: Bun.env.GUILD_ID!,
   },
