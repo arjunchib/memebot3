@@ -19,7 +19,6 @@ import { audioService } from "../services/audio_service";
 interface ProvisionalMeme {
   name: string;
   sourceUrl: string;
-  authorId: string;
 }
 
 export class AddController {
@@ -46,7 +45,7 @@ export class AddController {
     const sourceBtn = link(sourceType, linkUrl);
     const saveBtn = button("Save").primary().customId(`save:${id}`);
     const skipBtn = button("Skip").secondary().customId(`skip:${id}`);
-    await kv.set(`add:${id}`, { name, sourceUrl });
+    await kv.set<ProvisionalMeme>(`add:${id}`, { name, sourceUrl });
     await Promise.all([
       audioService.play(id),
       interaction.editResponse({
@@ -80,6 +79,7 @@ export class AddController {
         loudnessLra: loudness.output_lra,
         loudnessThresh: loudness.output_thresh,
         loudnessTp: loudness.output_tp,
+        authorId: interaction.member.user.id,
       })
       .returning();
     await db.insert(commands).values([
