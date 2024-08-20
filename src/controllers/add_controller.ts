@@ -65,11 +65,19 @@ export class AddController {
     const normalizedFile = audioService.normalizedFile(id);
     let loudness = await audioService.loudnorm(id);
     loudness = await audioService.loudnorm(id, loudness);
-    const uploadPromise = bucket.upload(
-      `audio/${id}.webm`,
-      Bun.file(normalizedFile).readable
-    );
-    const stats = await ffprobe(file);
+    await audioService.waveform(id);
+    const waveformFile = audioService.waveformFile(id);
+    const [stats, ,] = await Promise.all([
+      ffprobe(file),
+      bucket.upload(
+        `audio/${id}.webm`,
+        await Bun.file(normalizedFile).arrayBuffer()
+      ),
+      bucket.upload(
+        `waveform/${id}.png`,
+        await Bun.file(waveformFile).arrayBuffer()
+      ),
+    ]);
     const [meme] = await db
       .insert(memes)
       .values({
@@ -80,6 +88,7 @@ export class AddController {
         loudnessThresh: loudness.output_thresh,
         loudnessTp: loudness.output_tp,
         authorId: interaction.member.user.id,
+        id,
       })
       .returning();
     await db.insert(commands).values([
@@ -88,7 +97,11 @@ export class AddController {
         name: meme.name.toLowerCase(),
       },
     ]);
-    await Promise.all([unlink(file), unlink(normalizedFile), uploadPromise]);
+    await Promise.all([
+      unlink(file),
+      unlink(normalizedFile),
+      unlink(waveformFile),
+    ]);
     const messageId =
       interaction.message?.interaction_metadata.original_response_message_id;
     const channelId = interaction.message?.channel_id;

@@ -180,6 +180,7 @@ test.webm
 *.sqlite-shm
 *.sqlite-wal
 audio
+waveform
 mb-serve
 mb-seed
 .env.staging
