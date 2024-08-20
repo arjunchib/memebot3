@@ -1,8 +1,8 @@
 import { db } from "./database";
 import { dbLegacy } from "../legacy-db/database";
 import { commands, memeTags, memes, tags } from "./schema";
-import { bucket, oldBucket } from "../bucket";
-import { Pool } from "../pool";
+import { bucket, oldBucket } from "../services/bucket";
+import { Pool } from "../helpers/pool";
 import { migrate } from "drizzle-orm/bun-sqlite/migrator";
 
 console.log("Migrating db");

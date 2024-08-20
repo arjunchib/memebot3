@@ -3,7 +3,6 @@ import {
   ListObjectsV2Command,
   PutObjectCommand,
   S3Client,
-  type PutObjectCommandInput,
 } from "@aws-sdk/client-s3";
 
 export class Bucket {
@@ -18,16 +17,16 @@ export class Bucket {
 
   constructor(private bucket: string) {}
 
-  async upload(
-    file: string,
-    data: PutObjectCommandInput["Body"],
-    hash?: string
-  ) {
+  async upload(file: string, data: ArrayBuffer) {
+    const body = new Uint8Array(data);
+    const hasher = new Bun.CryptoHasher("md5");
+    hasher.update(data);
+    const hash = hasher.digest("base64");
     return await this.client.send(
       new PutObjectCommand({
         Key: file,
         Bucket: this.bucket,
-        Body: data,
+        Body: body,
         ACL: "public-read",
         ContentType: this.contentType(file),
         ContentMD5: hash,

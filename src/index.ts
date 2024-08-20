@@ -8,6 +8,9 @@ import { db } from "./db/database";
 try {
   mkdirSync("audio");
 } catch {}
+try {
+  mkdirSync("waveform");
+} catch {}
 
 if (Bun.env.NODE_ENV === "production") {
   migrate(db, { migrationsFolder: "drizzle" });

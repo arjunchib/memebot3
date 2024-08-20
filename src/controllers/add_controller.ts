@@ -3,36 +3,22 @@ import {
   DiscordRestService,
   button,
   inject,
-  joinVoice,
   link,
   type $slash,
 } from "peach";
 import { type add } from "../commands";
-import { ffprobe } from "../cli";
-import { bucket } from "../bucket";
+import { ffprobe } from "../helpers/cli";
+import { bucket } from "../services/bucket";
 import { db } from "../db/database";
 import { commands, memes } from "../db/schema";
 import { unlink } from "fs/promises";
-import { kv } from "../kv";
+import { kv } from "../services/kv";
 import { eq } from "drizzle-orm";
 import { audioService } from "../services/audio_service";
 
 interface ProvisionalMeme {
   name: string;
   sourceUrl: string;
-}
-
-interface LoudnormResults {
-  input_i: number;
-  input_lra: number;
-  input_tp: number;
-  input_thresh: number;
-  output_i: number;
-  output_tp: number;
-  output_lra: number;
-  output_thresh: number;
-  normalization_type: string;
-  target_offset: number;
 }
 
 export class AddController {
@@ -50,7 +36,7 @@ export class AddController {
       });
     }
     await interaction.defer();
-    const { sourceUrl, id } = await audioService.download(url);
+    const { sourceUrl, id } = await audioService.download(url, { start, end });
     const sourceType = this.sourceType(sourceUrl);
     let linkUrl = sourceUrl;
     if (start && sourceType === "YouTube") {
@@ -59,7 +45,7 @@ export class AddController {
     const sourceBtn = link(sourceType, linkUrl);
     const saveBtn = button("Save").primary().customId(`save:${id}`);
     const skipBtn = button("Skip").secondary().customId(`skip:${id}`);
-    await kv.set(`add:${id}`, { name, sourceUrl });
+    await kv.set<ProvisionalMeme>(`add:${id}`, { name, sourceUrl });
     await Promise.all([
       audioService.play(id),
       interaction.editResponse({
@@ -79,11 +65,19 @@ export class AddController {
     const normalizedFile = audioService.normalizedFile(id);
     let loudness = await audioService.loudnorm(id);
     loudness = await audioService.loudnorm(id, loudness);
-    const uploadPromise = bucket.upload(
-      `audio/${id}.webm`,
-      Bun.file(normalizedFile).readable
-    );
-    const stats = await ffprobe(file);
+    await audioService.waveform(id);
+    const waveformFile = audioService.waveformFile(id);
+    const [stats, ,] = await Promise.all([
+      ffprobe(file),
+      bucket.upload(
+        `audio/${id}.webm`,
+        await Bun.file(normalizedFile).arrayBuffer()
+      ),
+      bucket.upload(
+        `waveform/${id}.png`,
+        await Bun.file(waveformFile).arrayBuffer()
+      ),
+    ]);
     const [meme] = await db
       .insert(memes)
       .values({
@@ -93,6 +87,8 @@ export class AddController {
         loudnessLra: loudness.output_lra,
         loudnessThresh: loudness.output_thresh,
         loudnessTp: loudness.output_tp,
+        authorId: interaction.member.user.id,
+        id,
       })
       .returning();
     await db.insert(commands).values([
@@ -101,7 +97,11 @@ export class AddController {
         name: meme.name.toLowerCase(),
       },
     ]);
-    await Promise.all([unlink(file), unlink(normalizedFile), uploadPromise]);
+    await Promise.all([
+      unlink(file),
+      unlink(normalizedFile),
+      unlink(waveformFile),
+    ]);
     const messageId =
       interaction.message?.interaction_metadata.original_response_message_id;
     const channelId = interaction.message?.channel_id;

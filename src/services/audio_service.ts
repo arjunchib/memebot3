@@ -1,5 +1,5 @@
 import { joinVoice } from "peach";
-import { ffmpeg, ytdlp } from "../cli";
+import { ffmpeg, ytdlp } from "../helpers/cli";
 
 interface LoudnormResults {
   input_i: number;
@@ -84,12 +84,32 @@ export class AudioService {
     return loudnorm;
   }
 
+  async waveform(id: string) {
+    return await ffmpeg(
+      "-i",
+      this.normalizedFile(id),
+      "-filter_complex",
+      "compand,showwavespic=s=512x128:colors=white",
+      "-frames:v",
+      "1",
+      "-c:v",
+      "png",
+      "-f",
+      "image2",
+      this.waveformFile(id)
+    );
+  }
+
   file(id: string) {
     return `./audio/${id}.webm`;
   }
 
   normalizedFile(id: string) {
     return `./audio/${id}-normalized.webm`;
+  }
+
+  waveformFile(id: string) {
+    return `./waveform/${id}.png`;
   }
 }
 
