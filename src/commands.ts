@@ -15,7 +15,7 @@ export const add = slashCommand("add", "adds a meme").options([
 ]);
 
 export const play = slashCommand("play", "plays a meme").options([
-  string("name", "Command for meme").autocomplete().required(),
+  string("meme", "Command for meme").autocomplete().required(),
 ]);
 
 export const random = slashCommand("random", "plays a random meme");
@@ -75,4 +75,8 @@ export const edit = slashCommand("edit", "edit a meme").options([
   rename,
 ]);
 
-export const commands = { add, play, info, list, edit, random };
+export const dlt = slashCommand("delete", "delete a meme").options([
+  string("meme", "Command for meme").autocomplete().required(),
+]);
+
+export const commands = { add, play, info, list, edit, random, dlt };

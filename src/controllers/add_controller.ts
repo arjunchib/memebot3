@@ -53,7 +53,10 @@ export class AddController {
         components: [[sourceBtn]],
       }),
     ]);
-    await interaction.followupWith([[saveBtn, skipBtn]]);
+    await interaction.followupWith({
+      components: [[saveBtn, skipBtn]],
+      flags: 64,
+    });
   }
 
   async save(interaction: ComponentInteraction) {

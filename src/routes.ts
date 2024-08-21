@@ -3,6 +3,7 @@ import {
   add,
   addCommand,
   addTag,
+  dlt,
   info,
   list,
   play,
@@ -17,6 +18,7 @@ import { EditController } from "./controllers/edit_controller";
 import { AddController } from "./controllers/add_controller";
 import { PlayController } from "./controllers/play_controller";
 import { AutocompleteController } from "./controllers/autocomplete_controller";
+import { DeleteController } from "./controllers/delete_controller";
 
 export const routes: Route[] = [
   // Add
@@ -26,7 +28,7 @@ export const routes: Route[] = [
 
   // Play
   commandRoute(play).to(PlayController, "play"),
-  autocompleteRoute(play).focus("name").to(AutocompleteController, "meme"),
+  autocompleteRoute(play).focus("meme").to(AutocompleteController, "meme"),
 
   // Random
   commandRoute(random).to(PlayController, "random"),
@@ -69,4 +71,10 @@ export const routes: Route[] = [
   // List
   commandRoute(list).to(ListController, "list"),
   autocompleteRoute(list).focus("tag").to(AutocompleteController, "tag"),
+
+  // Delete
+  commandRoute(dlt).to(DeleteController, "dlt"),
+  autocompleteRoute(dlt).focus("meme").to(AutocompleteController, "meme"),
+  customIdRoute(/^delete:/).to(DeleteController, "confirm"),
+  customIdRoute("skip-delete").to(DeleteController, "skip"),
 ];
