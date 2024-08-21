@@ -18,16 +18,6 @@ if (Bun.env.NODE_ENV === "production") {
   migrate(db, { migrationsFolder: "drizzle" });
 }
 
-// remove broken memes
-const memeIds = (await db.query.memes.findMany({ columns: { id: true } })).map(
-  (m) => m.id
-);
-const deleted = await db
-  .delete(commandsDb)
-  .where(notInArray(commandsDb.memeId, memeIds))
-  .returning();
-console.log(`Deleted ${deleted.length} commands`);
-
 await bootstrap({
   applicationId: Bun.env.APPLICATION_ID!,
   token: Bun.env.TOKEN!,
