@@ -3,6 +3,7 @@ import type { play, random } from "../commands";
 import { db } from "../db/database";
 import { eq, sql } from "drizzle-orm";
 import { commands, memes } from "../db/schema";
+import type { SlashInteraction } from "peach/lib/interactions/slash_interaction";
 
 export class PlayController {
   async play(interaction: $slash<typeof play>) {
@@ -17,7 +18,7 @@ export class PlayController {
     }
     await interaction.respondWith(`Playing *${meme.name}*`);
     try {
-      await this.playAudio(meme.id);
+      await this.playAudio(meme.id, interaction);
       await db
         .update(memes)
         .set({
@@ -46,7 +47,7 @@ export class PlayController {
     }
     await interaction.respondWith(`Playing *${meme.name}*`);
     try {
-      await this.playAudio(id);
+      await this.playAudio(id, interaction);
       await db
         .update(memes)
         .set({
@@ -60,7 +61,7 @@ export class PlayController {
     }
   }
 
-  private async playAudio(id: string) {
+  private async playAudio(id: string, interaction: SlashInteraction<any>) {
     const res = await fetch(
       `${Bun.env.BUCKET_ENDPOINT}/${Bun.env.BUCKET!}/audio/${id}.webm`
     );
@@ -71,7 +72,11 @@ export class PlayController {
       self_deaf: true,
       self_mute: false,
     });
-    await voiceConn.playAudio(res);
-    voiceConn.disconnect();
+    if (voiceConn) {
+      await voiceConn.playAudio(res);
+      voiceConn.disconnect();
+    } else {
+      interaction.editResponse(`Meme already playing`);
+    }
   }
 }

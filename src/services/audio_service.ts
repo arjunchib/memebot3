@@ -22,8 +22,10 @@ export class AudioService {
       self_deaf: true,
       self_mute: false,
     });
-    await voiceConn.playAudio(Bun.file(this.file(id)));
-    voiceConn.disconnect();
+    if (voiceConn) {
+      await voiceConn.playAudio(Bun.file(this.file(id)));
+      voiceConn.disconnect();
+    }
   }
 
   async download(
