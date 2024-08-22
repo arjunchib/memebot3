@@ -100,6 +100,7 @@ export class InfoController {
         {
           author,
           title: meme.name,
+          url: meme.sourceUrl || undefined,
           description: aliases.join(", "),
           fields,
           color: (247 << 16) + (212 << 8) + 87,
