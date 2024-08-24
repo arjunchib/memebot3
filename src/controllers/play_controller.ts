@@ -73,8 +73,11 @@ export class PlayController {
       self_mute: false,
     });
     if (voiceConn) {
-      await voiceConn.playAudio(res);
-      voiceConn.disconnect();
+      try {
+        await voiceConn.playAudio(res);
+      } finally {
+        voiceConn.disconnect();
+      }
     } else {
       interaction.editResponse(`Meme already playing`);
     }

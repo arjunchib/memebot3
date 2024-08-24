@@ -23,8 +23,11 @@ export class AudioService {
       self_mute: false,
     });
     if (voiceConn) {
-      await voiceConn.playAudio(Bun.file(this.file(id)));
-      voiceConn.disconnect();
+      try {
+        await voiceConn.playAudio(Bun.file(this.file(id)));
+      } finally {
+        voiceConn.disconnect();
+      }
     }
   }
 
