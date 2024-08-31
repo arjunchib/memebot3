@@ -1,11 +1,10 @@
-import { bootstrap } from "peach";
 import { commands } from "./commands";
-import { commands as commandsDb, memes } from "./db/schema";
 import { routes } from "./routes";
 import { mkdirSync } from "fs";
 import { migrate } from "drizzle-orm/bun-sqlite/migrator";
 import { db } from "./db/database";
-import { notInArray } from "drizzle-orm";
+import { logError } from "orange";
+import { bootstrapGateway } from "peach";
 
 try {
   mkdirSync("audio");
@@ -18,7 +17,7 @@ if (Bun.env.NODE_ENV === "production") {
   migrate(db, { migrationsFolder: "drizzle" });
 }
 
-await bootstrap({
+await bootstrapGateway({
   applicationId: Bun.env.APPLICATION_ID!,
   token: Bun.env.TOKEN!,
   commands,
@@ -28,4 +27,5 @@ await bootstrap({
     guildId: Bun.env.GUILD_ID!,
   },
   intents: 1 << 7,
+  error: logError,
 });

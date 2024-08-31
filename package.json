@@ -23,6 +23,7 @@
     "date-fns": "^3.6.0",
     "drizzle-orm": "^0.33.0",
     "peach": "link:peach",
+    "orange": "link:orange",
     "words-to-numbers": "^1.5.1"
   }
 }

@@ -4,9 +4,11 @@ import { db } from "../db/database";
 import { eq, sql } from "drizzle-orm";
 import { commands, memes } from "../db/schema";
 import type { SlashInteraction } from "peach/lib/interactions/slash_interaction";
+import { logError } from "orange";
 
 export class PlayController {
   async play(interaction: $slash<typeof play>) {
+    throw new Error("Test error");
     const name = interaction.options().meme;
     const command = await db.query.commands.findFirst({
       where: eq(commands.name, name),
@@ -75,6 +77,8 @@ export class PlayController {
     if (voiceConn) {
       try {
         await voiceConn.playAudio(res);
+      } catch (e) {
+        await logError(e);
       } finally {
         voiceConn.disconnect();
       }
