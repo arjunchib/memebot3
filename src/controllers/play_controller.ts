@@ -78,7 +78,10 @@ export class PlayController {
         voiceConn.disconnect();
       }
     } else {
-      interaction.respondWith(`Meme already playing`);
+      interaction.respondWith({
+        content: `Meme already playing`,
+        flags: 1 << 6,
+      });
     }
   }
 }
