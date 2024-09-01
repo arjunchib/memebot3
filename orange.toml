@@ -1,1 +1,1 @@
-deploy = "sudo yt-dlp -U & bun i --production && sudo systemctl restart memebot"
+deploy = "sudo yt-dlp -U && bun i --production && sudo systemctl restart memebot"
