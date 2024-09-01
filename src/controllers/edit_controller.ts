@@ -2,7 +2,6 @@ import type { $autocomplete, $slash } from "peach";
 import {
   type addCommand,
   type addTag,
-  type edit,
   type removeCommand,
   type removeTag,
   type rename,
