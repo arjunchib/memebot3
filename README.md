@@ -29,4 +29,4 @@ bun run seed
 
 ## Release
 
-Force CI 2
+Force CI 3
