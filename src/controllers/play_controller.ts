@@ -17,20 +17,15 @@ export class PlayController {
     if (!meme) {
       return await interaction.respondWith(`404 Meme not found`);
     }
-    await interaction.respondWith(`Playing *${meme.name}*`);
-    try {
-      await this.playAudio(meme.id, interaction);
-      await db
-        .update(memes)
-        .set({
-          playCount: meme.playCount + 1,
-          // TODO: remove once this is fixed https://github.com/drizzle-team/drizzle-orm/issues/2388
-          updatedAt: sql`(unixepoch())`,
-        })
-        .where(eq(memes.id, meme.id));
-    } catch (e) {
-      await interaction.editResponse(`Failed to play *${meme.name}*`);
-    }
+    await this.playAudio(meme.id, interaction, meme.name);
+    await db
+      .update(memes)
+      .set({
+        playCount: meme.playCount + 1,
+        // TODO: remove once this is fixed https://github.com/drizzle-team/drizzle-orm/issues/2388
+        updatedAt: sql`(unixepoch())`,
+      })
+      .where(eq(memes.id, meme.id));
   }
 
   async random(interaction: $slash<typeof random>) {
@@ -46,23 +41,22 @@ export class PlayController {
         `404 Meme not found (this should not happen)`
       );
     }
-    await interaction.respondWith(`Playing *${meme.name}*`);
-    try {
-      await this.playAudio(id, interaction);
-      await db
-        .update(memes)
-        .set({
-          randomPlayCount: meme.randomPlayCount + 1,
-          // TODO: remove once this is fixed https://github.com/drizzle-team/drizzle-orm/issues/2388
-          updatedAt: sql`(unixepoch())`,
-        })
-        .where(eq(memes.id, id));
-    } catch (e) {
-      await interaction.editResponse(`Failed to play *${meme.name}*`);
-    }
+    await this.playAudio(id, interaction, meme.name);
+    await db
+      .update(memes)
+      .set({
+        randomPlayCount: meme.randomPlayCount + 1,
+        // TODO: remove once this is fixed https://github.com/drizzle-team/drizzle-orm/issues/2388
+        updatedAt: sql`(unixepoch())`,
+      })
+      .where(eq(memes.id, id));
   }
 
-  private async playAudio(id: string, interaction: SlashInteraction<any>) {
+  private async playAudio(
+    id: string,
+    interaction: SlashInteraction<any>,
+    memeName: string
+  ) {
     const res = await fetch(
       `${Bun.env.BUCKET_ENDPOINT}/${Bun.env.BUCKET!}/audio/${id}.webm`
     );
@@ -74,15 +68,17 @@ export class PlayController {
       self_mute: false,
     });
     if (voiceConn) {
+      await interaction.respondWith(`Playing *${memeName}*`);
       try {
         await voiceConn.playAudio(res);
       } catch (e) {
+        interaction.editResponse(`Error playing *${memeName}*`);
         await logError(e);
       } finally {
         voiceConn.disconnect();
       }
     } else {
-      interaction.editResponse(`Meme already playing`);
+      interaction.respondWith(`Meme already playing`);
     }
   }
 }
