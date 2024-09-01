@@ -131,6 +131,8 @@ export class AddController {
       return "YouTube";
     } else if (url.includes("x.com") || url.includes("twitter.com")) {
       return "X";
+    } else if (url.includes("tiktok.com")) {
+      return "TikTok";
     } else {
       return "Unknown";
     }
