@@ -27,5 +27,5 @@ await bootstrapGateway({
     guildId: Bun.env.GUILD_ID!,
   },
   intents: 1 << 7,
-  error: logError,
+  error: console.error,
 });
