@@ -133,6 +133,8 @@ export class AddController {
       return "X";
     } else if (url.includes("tiktok.com")) {
       return "TikTok";
+    } else if (url.includes("facebook.com")) {
+      return "Facebook";
     } else {
       return "Unknown";
     }
