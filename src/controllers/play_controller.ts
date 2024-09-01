@@ -8,7 +8,6 @@ import { logError } from "orange";
 
 export class PlayController {
   async play(interaction: $slash<typeof play>) {
-    throw new Error("Test error");
     const name = interaction.options().meme;
     const command = await db.query.commands.findFirst({
       where: eq(commands.name, name),
