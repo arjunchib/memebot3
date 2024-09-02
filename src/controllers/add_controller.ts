@@ -27,13 +27,21 @@ export class AddController {
 
   async add(interaction: $slash<typeof add>) {
     const { name, url, start, end } = interaction.options();
+    try {
+      new URL(url); // errors if malformed url
+    } catch {
+      return await interaction.respondWith({
+        content: "The provided url is invalid",
+        flags: 1 << 6,
+      });
+    }
     const command = await db.query.commands.findFirst({
       where: eq(commands.name, name.toLowerCase()),
     });
     if (command) {
       return await interaction.respondWith({
-        content: "Meme with this name already exists!",
-        flags: 64,
+        content: "Meme with this name already exists",
+        flags: 1 << 6,
       });
     }
     await interaction.defer();
