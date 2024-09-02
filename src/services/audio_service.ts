@@ -1,7 +1,7 @@
 import { joinVoice } from "peach";
 import { ffmpeg, ytdlp } from "../helpers/cli";
 
-interface LoudnormResults {
+export interface LoudnormResults {
   input_i: number;
   input_lra: number;
   input_tp: number;
@@ -24,7 +24,7 @@ export class AudioService {
     });
     if (voiceConn) {
       try {
-        await voiceConn.playAudio(Bun.file(this.file(id)));
+        await voiceConn.playAudio(Bun.file(this.normalizedFile(id)));
       } finally {
         voiceConn.disconnect();
       }

@@ -14,11 +14,12 @@ import { commands, memes } from "../db/schema";
 import { unlink } from "fs/promises";
 import { kv } from "../services/kv";
 import { eq } from "drizzle-orm";
-import { audioService } from "../services/audio_service";
+import { audioService, type LoudnormResults } from "../services/audio_service";
 
 interface ProvisionalMeme {
   name: string;
   sourceUrl: string;
+  loudness: LoudnormResults;
 }
 
 export class AddController {
@@ -37,6 +38,8 @@ export class AddController {
     }
     await interaction.defer();
     const { sourceUrl, id } = await audioService.download(url, { start, end });
+    let loudness = await audioService.loudnorm(id);
+    loudness = await audioService.loudnorm(id, loudness);
     const sourceType = this.sourceType(sourceUrl);
     let linkUrl = sourceUrl;
     if (start && sourceType === "YouTube") {
@@ -45,7 +48,7 @@ export class AddController {
     const sourceBtn = link(sourceType, linkUrl);
     const saveBtn = button("Save").primary().customId(`save:${id}`);
     const skipBtn = button("Skip").secondary().customId(`skip:${id}`);
-    await kv.set<ProvisionalMeme>(`add:${id}`, { name, sourceUrl });
+    await kv.set<ProvisionalMeme>(`add:${id}`, { name, sourceUrl, loudness });
     await Promise.all([
       audioService.play(id),
       interaction.editResponse({
@@ -64,10 +67,9 @@ export class AddController {
     const id = this.getCustomId(interaction);
     const provisionalMeme = await kv.get<ProvisionalMeme>(`add:${id}`);
     if (!provisionalMeme) throw new Error("Cannot find meme");
+    const { loudness } = provisionalMeme;
     const file = audioService.file(id);
     const normalizedFile = audioService.normalizedFile(id);
-    let loudness = await audioService.loudnorm(id);
-    loudness = await audioService.loudnorm(id, loudness);
     await audioService.waveform(id);
     const waveformFile = audioService.waveformFile(id);
     const [stats, ,] = await Promise.all([
