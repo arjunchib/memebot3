@@ -78,7 +78,9 @@ export class AudioService {
     const result = await ffmpeg(...cmd);
 
     // Parse results
-    const loudnormStr = result.match(/{[\s\S]*}/)?.[0];
+    const loudnormStr = result
+      .split("[Parsed_loudnorm_0")[1]
+      .match(/{[\s\S]*}/)?.[0];
     if (!loudnormStr) throw new Error("Could not parse results");
     const loudnorm = JSON.parse(loudnormStr);
     for (const field in loudnorm) {
