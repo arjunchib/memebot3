@@ -21,6 +21,7 @@ export class EditController {
         .values({ memeId, tagName: tag })
         .onConflictDoNothing();
     });
+    await interaction.respondWith(`Tagged \`${meme}\` with \`${tag}\``);
   }
 
   async removeTag(interaction: $slash<typeof removeTag>) {
@@ -29,6 +30,7 @@ export class EditController {
     await db
       .delete(memeTags)
       .where(and(eq(memeTags.memeId, memeId), eq(memeTags.tagName, tag)));
+    await interaction.respondWith(`Untagged \`${meme}\` with \`${tag}\``);
   }
 
   async addCommand(interaction: $slash<typeof addCommand>) {
