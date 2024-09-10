@@ -7,7 +7,7 @@ import {
   type rename,
 } from "../commands";
 import { db } from "../db/database";
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { commands, memeTags, memes, tags } from "../db/schema";
 
 export class EditController {
@@ -21,7 +21,9 @@ export class EditController {
         .values({ memeId, tagName: tag })
         .onConflictDoNothing();
     });
-    await interaction.respondWith(`Tagged \`${meme}\` with \`${tag}\``);
+    await interaction.respondWith(
+      `Updated ***${meme}*** by adding tag ***${tag}***`
+    );
   }
 
   async removeTag(interaction: $slash<typeof removeTag>) {
@@ -30,7 +32,9 @@ export class EditController {
     await db
       .delete(memeTags)
       .where(and(eq(memeTags.memeId, memeId), eq(memeTags.tagName, tag)));
-    await interaction.respondWith(`Untagged \`${meme}\` with \`${tag}\``);
+    await interaction.respondWith(
+      `Updated ***${meme}*** by removing tag ***${tag}***`
+    );
   }
 
   async addCommand(interaction: $slash<typeof addCommand>) {
@@ -40,20 +44,35 @@ export class EditController {
       name: command,
       memeId,
     });
+    await interaction.respondWith(
+      `Updated ***${meme}*** by adding command ***${command}***`
+    );
   }
 
   async removeCommand(interaction: $slash<typeof removeCommand>) {
     const { meme, command } = interaction.options();
     const memeId = await this.findMeme(meme);
-    await db.insert(commands).values({
-      name: command,
-      memeId,
-    });
+    await db
+      .delete(commands)
+      .where(and(eq(commands.name, command), eq(commands.memeId, memeId)));
+    await interaction.respondWith(
+      `Updated ***${meme}*** by removing command ***${command}***`
+    );
   }
 
   async rename(interaction: $slash<typeof rename>) {
     const { meme, name } = interaction.options();
-    await db.update(memes).set({ name }).where(eq(memes.name, meme));
+    await db
+      .update(memes)
+      .set({
+        name,
+        // TODO: remove once this is fixed https://github.com/drizzle-team/drizzle-orm/issues/2388
+        updatedAt: sql`(unixepoch())`,
+      })
+      .where(eq(memes.name, meme));
+    await interaction.respondWith(
+      `Updated ***${meme}*** by renaming to ***${name}***`
+    );
   }
 
   async removeTagAutocomplete(interaction: $autocomplete<typeof removeTag>) {
