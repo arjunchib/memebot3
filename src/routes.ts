@@ -11,6 +11,7 @@ import {
   removeCommand,
   removeTag,
   rename,
+  sql,
 } from "./commands";
 import { ListController } from "./controllers/list_controller";
 import { InfoController } from "./controllers/info_controller";
@@ -19,6 +20,7 @@ import { AddController } from "./controllers/add_controller";
 import { PlayController } from "./controllers/play_controller";
 import { AutocompleteController } from "./controllers/autocomplete_controller";
 import { DeleteController } from "./controllers/delete_controller";
+import { SqlController } from "./controllers/sql_controller";
 
 export const routes: Route[] = [
   // Add
@@ -77,4 +79,7 @@ export const routes: Route[] = [
   autocompleteRoute(dlt).focus("meme").to(AutocompleteController, "meme"),
   customIdRoute(/^delete:/).to(DeleteController, "confirm"),
   customIdRoute("skip-delete").to(DeleteController, "skip"),
+
+  // SQL
+  commandRoute(sql).to(SqlController, "sql"),
 ];

@@ -79,4 +79,9 @@ export const dlt = slashCommand("delete", "delete a meme").options([
   string("meme", "Command for meme").autocomplete().required(),
 ]);
 
-export const commands = { add, play, info, list, edit, random, dlt };
+export const sql = slashCommand(
+  "sql",
+  "run sql query on meme database"
+).options([string("query", "SQL query to execute").required()]);
+
+export const commands = { add, play, info, list, edit, random, dlt, sql };

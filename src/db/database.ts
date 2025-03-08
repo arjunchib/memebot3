@@ -24,3 +24,7 @@ export const db = drizzle(sqlite, {
     memeTagsRelations,
   },
 });
+
+export const sqliteReadonly = new Database("memebot.sqlite", {
+  readonly: true,
+});
