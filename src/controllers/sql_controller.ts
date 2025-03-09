@@ -5,17 +5,27 @@ import { sqliteReadonly } from "../db/database";
 export class SqlController {
   async sql(interaction: $slash<typeof sql>) {
     const { query } = interaction.options();
-    let output: string;
     try {
       const results = sqliteReadonly.query(query).all();
-      output = results
-        .map((result) => JSON.stringify(result as any, null, 2))
-        .join("\n");
+      if (results.length === 0) {
+        await interaction.respondWith("```No results!```");
+      } else {
+        await interaction.respondWith(
+          {
+            attachments: [
+              {
+                id: 0 as unknown as string,
+                content_type: "application/json",
+                filename: `${interaction.id}.json`,
+                ephemeral: true,
+              },
+            ],
+          },
+          [[JSON.stringify(results, null, 2)]]
+        );
+      }
     } catch (e: any) {
-      output = e.toString();
+      await interaction.respondWith(`\`\`\`${e.toString()}\`\`\``);
     }
-    await interaction.respondWith(`\`\`\`
-${output.trim().slice(0, 2000 - 8)}
-\`\`\``);
   }
 }

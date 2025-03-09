@@ -4,7 +4,6 @@ import { db } from "../db/database";
 import { eq, sql } from "drizzle-orm";
 import { commands, memes } from "../db/schema";
 import type { SlashInteraction } from "peach/lib/interactions/slash_interaction";
-import { logError } from "orange";
 
 export class PlayController {
   async play(interaction: $slash<typeof play>) {
@@ -73,7 +72,7 @@ export class PlayController {
         await voiceConn.playAudio(res);
       } catch (e) {
         interaction.editResponse(`Error playing *${memeName}*`);
-        await logError(e);
+        // await logError(e);
       } finally {
         voiceConn.disconnect();
       }

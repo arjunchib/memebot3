@@ -3,7 +3,6 @@ import { routes } from "./routes";
 import { mkdirSync } from "fs";
 import { migrate } from "drizzle-orm/bun-sqlite/migrator";
 import { db } from "./db/database";
-import { logError } from "orange";
 import { bootstrapGateway } from "peach";
 
 try {
