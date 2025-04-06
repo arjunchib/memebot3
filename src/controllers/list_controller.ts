@@ -106,8 +106,14 @@ export class ListController {
   }
 
   private playsFilters() {
-    const range = this.parseRange(this.interaction?.options().plays);
-    if (!range) return [];
+    const playsStr = this.interaction?.options().plays;
+    if (!playsStr) {
+      return [];
+    }
+    const range = this.parseRange(playsStr);
+    if (!range) {
+      return [eq(memes.playCount, parseInt(playsStr))];
+    }
     const filters = [];
     if (range.start) {
       filters.push(gte(memes.playCount, parseInt(range.start)));
