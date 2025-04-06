@@ -107,7 +107,6 @@ export class ListController {
 
   private playsFilters() {
     const range = this.parseRange(this.interaction?.options().plays);
-    console.log(range);
     if (!range) return [];
     const filters = [];
     if (range.start) {
@@ -116,9 +115,9 @@ export class ListController {
     if (range.end) {
       const end = parseInt(range.end);
       if (range.inclusive) {
-        filters.push(lte(memes.duration, end));
+        filters.push(lte(memes.playCount, end));
       } else {
-        filters.push(lt(memes.duration, end));
+        filters.push(lt(memes.playCount, end));
       }
     }
     return filters;
