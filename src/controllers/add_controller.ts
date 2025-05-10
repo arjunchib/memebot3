@@ -45,29 +45,38 @@ export class AddController {
       });
     }
     await interaction.defer();
-    const { sourceUrl, id } = await audioService.download(url, { start, end });
-    let loudness = await audioService.loudnorm(id);
-    loudness = await audioService.loudnorm(id, loudness);
-    const sourceType = this.sourceType(sourceUrl);
-    let linkUrl = sourceUrl;
-    if (start && sourceType === "YouTube") {
-      linkUrl += `&t=${start}s`;
-    }
-    const sourceBtn = link(sourceType, linkUrl);
-    const saveBtn = button("Save").primary().customId(`save:${id}`);
-    const skipBtn = button("Skip").secondary().customId(`skip:${id}`);
-    await kv.set<ProvisionalMeme>(`add:${id}`, { name, sourceUrl, loudness });
-    await Promise.all([
-      audioService.play(id),
+    try {
+      const { sourceUrl, id } = await audioService.download(url, {
+        start,
+        end,
+      });
+      let loudness = await audioService.loudnorm(id);
+      loudness = await audioService.loudnorm(id, loudness);
+      const sourceType = this.sourceType(sourceUrl);
+      let linkUrl = sourceUrl;
+      if (start && sourceType === "YouTube") {
+        linkUrl += `&t=${start}s`;
+      }
+      const sourceBtn = link(sourceType, linkUrl);
+      const saveBtn = button("Save").primary().customId(`save:${id}`);
+      const skipBtn = button("Skip").secondary().customId(`skip:${id}`);
+      await kv.set<ProvisionalMeme>(`add:${id}`, { name, sourceUrl, loudness });
+      await Promise.all([
+        audioService.play(id),
+        interaction.editResponse({
+          content: `Previewing *${name}*`,
+          components: [[sourceBtn]],
+        }),
+      ]);
+      await interaction.followupWith({
+        components: [[saveBtn, skipBtn]],
+        flags: 64,
+      });
+    } catch {
       interaction.editResponse({
-        content: `Previewing *${name}*`,
-        components: [[sourceBtn]],
-      }),
-    ]);
-    await interaction.followupWith({
-      components: [[saveBtn, skipBtn]],
-      flags: 64,
-    });
+        content: `Error adding meme!`,
+      });
+    }
   }
 
   async save(interaction: ComponentInteraction) {

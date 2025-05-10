@@ -1,7 +1,7 @@
 export async function ffmpeg(...args: string[]) {
-  const proc = Bun.spawn(["ffmpeg", "-hide_banner", "-y", ...args], {
-    stderr: "pipe",
-  });
+  args = ["ffmpeg", "-hide_banner", "-y", ...args];
+  log_cmd(args);
+  const proc = Bun.spawn(args, { stderr: "pipe" });
   return await Bun.readableStreamToText(proc.stderr);
 }
 
@@ -23,23 +23,35 @@ export async function ffprobe(...args: string[]) {
   };
 }
 
-export async function ytdlp(url: string) {
+export async function ytdlp(url: string, id: string) {
   const args = [
     "yt-dlp",
-    "--print",
-    "webpage_url,urls",
     "-f",
     "ba*",
     "--format-sort-force",
     "hasaud,acodec:opus,aext:webm,proto:http",
     url,
+    "--print",
+    "webpage_url,filename",
+    "--no-simulate",
+    "-o",
+    `./audio/${id}.%(ext)s`,
   ];
-  console.log(args.join(" "));
+  log_cmd(args);
   const proc = Bun.spawn(args);
   const output = await new Response(proc.stdout).text();
-  const [sourceUrl, audioUrl] = output.trim().split("\n");
-  if (!sourceUrl || !audioUrl) {
+  const [sourceUrl, filename] = output.trim().split("\n");
+  if (!sourceUrl || !filename) {
     throw new Error("Could not find audio url");
   }
-  return { sourceUrl, audioUrl };
+  return { sourceUrl, filename };
+}
+
+function log_cmd(args: string[]) {
+  console.log(
+    [
+      args[0],
+      ...args.slice(1).map((arg) => (arg.startsWith("-") ? arg : `"${arg}"`)),
+    ].join(" ")
+  );
 }

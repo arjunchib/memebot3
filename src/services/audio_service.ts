@@ -1,5 +1,6 @@
 import { joinVoice } from "peach";
 import { ffmpeg, ytdlp } from "../helpers/cli";
+import { unlink } from "fs/promises";
 
 export interface LoudnormResults {
   input_i: number;
@@ -38,8 +39,8 @@ export class AudioService {
       end?: string;
     }
   ) {
-    const { sourceUrl, audioUrl } = await ytdlp(url);
     const id = crypto.randomUUID();
+    const { sourceUrl, filename } = await ytdlp(url, id);
     const ffmpegArgs = [];
     if (options?.start) {
       ffmpegArgs.push("-ss", options.start);
@@ -47,9 +48,10 @@ export class AudioService {
     if (options?.end) {
       ffmpegArgs.push("-to", options.end);
     }
-    ffmpegArgs.push("-i", audioUrl, "-c:a", "libopus", "-vn", this.file(id));
+    ffmpegArgs.push("-i", filename, "-c:a", "libopus", "-vn", this.file(id));
     await ffmpeg(...ffmpegArgs);
-    return { sourceUrl, audioUrl, id };
+    await unlink(filename);
+    return { sourceUrl, id };
   }
 
   async loudnorm(
