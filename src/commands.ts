@@ -18,7 +18,9 @@ export const play = slashCommand("play", "plays a meme").options([
   string("meme", "Command for meme").autocomplete().required(),
 ]);
 
-export const random = slashCommand("random", "plays a random meme");
+export const random = slashCommand("random", "plays a random meme").options([
+  string("tag", "Tag to pick meme from").autocomplete(),
+]);
 
 export const list = slashCommand("list", "list memes").options([
   user("author", "Filter by author"),

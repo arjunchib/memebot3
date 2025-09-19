@@ -2,7 +2,7 @@ import { joinVoice, type $slash } from "peach";
 import type { play, random } from "../commands";
 import { db } from "../db/database";
 import { eq, sql } from "drizzle-orm";
-import { commands, memes } from "../db/schema";
+import { commands, memes, memeTags } from "../db/schema";
 import type { SlashInteraction } from "peach/lib/interactions/slash_interaction";
 
 export class PlayController {
@@ -28,9 +28,10 @@ export class PlayController {
   }
 
   async random(interaction: $slash<typeof random>) {
-    const allMemes = await db.query.memes.findMany({ columns: { id: true } });
-    const randIdx = Math.floor(Math.random() * allMemes.length);
-    const id = allMemes[randIdx].id;
+    const { tag } = interaction.options();
+    const memeIds = await (tag ? this.getMemesByTag(tag) : this.getAllMemes());
+    const randIdx = Math.floor(Math.random() * memeIds.length);
+    const id = memeIds[randIdx];
     const meme = await db.query.memes.findFirst({
       where: eq(memes.id, id),
       columns: { randomPlayCount: true, name: true },
@@ -49,6 +50,19 @@ export class PlayController {
         updatedAt: sql`(unixepoch())`,
       })
       .where(eq(memes.id, id));
+  }
+
+  private async getAllMemes() {
+    const result = await db.query.memes.findMany({ columns: { id: true } });
+    return result.map((m) => m.id);
+  }
+
+  private async getMemesByTag(tag: string) {
+    const result = await db.query.memeTags.findMany({
+      where: eq(memeTags.tagName, tag),
+      columns: { memeId: true },
+    });
+    return result.map((mt) => mt.memeId);
   }
 
   private async playAudio(

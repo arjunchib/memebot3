@@ -34,6 +34,7 @@ export const routes: Route[] = [
 
   // Random
   commandRoute(random).to(PlayController, "random"),
+  autocompleteRoute(random).focus("tag").to(AutocompleteController, "tag"),
 
   // Info
   commandRoute(info).to(InfoController, "info"),
