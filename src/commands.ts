@@ -7,22 +7,22 @@ import {
   subcommandGroup,
 } from "peach";
 
-export const add = slashCommand("add", "adds a meme").options([
+export const add = slashCommand("add", "Adds a meme").options([
   string("url", "URL to download").required(),
   string("name", "Command for meme").required(),
   string("start", "Start time (from beginning if omitted)"),
   string("end", "End time (to end if omitted)"),
 ]);
 
-export const play = slashCommand("play", "plays a meme").options([
+export const play = slashCommand("play", "Plays a meme").options([
   string("meme", "Command for meme").autocomplete().required(),
 ]);
 
-export const random = slashCommand("random", "plays a random meme").options([
+export const random = slashCommand("random", "Plays a random meme").options([
   string("tag", "Tag to pick meme from").autocomplete(),
 ]);
 
-export const list = slashCommand("list", "list memes").options([
+export const list = slashCommand("list", "List memes").options([
   user("author", "Filter by author"),
   string("tag", "Filter by tag").autocomplete(),
   string("created", 'Filter by date (ex. "3-14-2022...")'),
@@ -39,18 +39,8 @@ export const list = slashCommand("list", "list memes").options([
   number("limit", "Limit to display (up to 50)").minValue(1).maxValue(50),
 ]);
 
-export const info = slashCommand("info", "show info about a meme").options([
+export const info = slashCommand("info", "Show info about a meme").options([
   string("meme", "Command for meme").required().autocomplete(),
-]);
-
-export const addTag = subcommand("add", "Add a tag").options([
-  string("meme", "Command for meme").required().autocomplete(),
-  string("tag", "Tag to add").required(),
-]);
-
-export const removeTag = subcommand("remove", "Remove a tag").options([
-  string("meme", "Command for meme").required().autocomplete(),
-  string("tag", "Tag to remove").required().autocomplete(),
 ]);
 
 export const addCommand = subcommand("add", "Add a command").options([
@@ -69,12 +59,29 @@ export const rename = subcommand("rename", "Rename a meme").options([
 ]);
 
 export const edit = slashCommand("edit", "edit a meme").options([
-  subcommandGroup("tag", "Modify tags").options([addTag, removeTag]),
   subcommandGroup("command", "Modify commands").options([
     addCommand,
     removeCommand,
   ]),
   rename,
+]);
+
+export const addTag = subcommand("add", "Add a tag").options([
+  string("meme", "Command for meme").required().autocomplete(),
+  string("tag", "Tag to add").required(),
+]);
+
+export const removeTag = subcommand("remove", "Remove a tag").options([
+  string("meme", "Command for meme").required().autocomplete(),
+  string("tag", "Tag to remove").required().autocomplete(),
+]);
+
+export const listTags = subcommand("list", "List tags");
+
+export const tag = slashCommand("tag", "Add or remove tags to memes").options([
+  addTag,
+  removeTag,
+  listTags,
 ]);
 
 export const dlt = slashCommand("delete", "delete a meme").options([
@@ -86,4 +93,4 @@ export const sql = slashCommand(
   "run sql query on meme database"
 ).options([string("query", "SQL query to execute").required()]);
 
-export const commands = { add, play, info, list, edit, random, dlt, sql };
+export const commands = { add, play, info, list, edit, random, dlt, sql, tag };

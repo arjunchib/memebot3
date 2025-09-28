@@ -6,6 +6,7 @@ import {
   dlt,
   info,
   list,
+  listTags,
   play,
   random,
   removeCommand,
@@ -21,6 +22,7 @@ import { PlayController } from "./controllers/play_controller";
 import { AutocompleteController } from "./controllers/autocomplete_controller";
 import { DeleteController } from "./controllers/delete_controller";
 import { SqlController } from "./controllers/sql_controller";
+import { TagController } from "./controllers/tag_controller";
 
 export const routes: Route[] = [
   // Add
@@ -40,17 +42,20 @@ export const routes: Route[] = [
   commandRoute(info).to(InfoController, "info"),
   autocompleteRoute(info).focus("meme").to(AutocompleteController, "meme"),
 
-  // Edit tags add
-  commandRoute(addTag).to(EditController, "addTag"),
+  // Tags add
+  commandRoute(addTag).to(TagController, "addTag"),
   autocompleteRoute(addTag).focus("meme").to(AutocompleteController, "meme"),
   autocompleteRoute(addTag).focus("tag").to(AutocompleteController, "tag"),
 
-  // Edit tags remove
-  commandRoute(removeTag).to(EditController, "removeTag"),
+  // Tags remove
+  commandRoute(removeTag).to(TagController, "removeTag"),
   autocompleteRoute(removeTag).focus("meme").to(AutocompleteController, "meme"),
   autocompleteRoute(removeTag)
     .focus("tag")
-    .to(EditController, "removeTagAutocomplete"),
+    .to(TagController, "removeTagAutocomplete"),
+
+  // Tags list
+  commandRoute(listTags).to(TagController, "listTags"),
 
   // Edit commands add
   commandRoute(addCommand).to(EditController, "addCommand"),
